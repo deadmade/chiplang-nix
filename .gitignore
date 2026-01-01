@@ -1,0 +1,18 @@
+# Nix build outputs
+result
+result-*
+
+# Flake lock (optional - can be tracked if you want to pin versions)
+# flake.lock
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Nix-specific
+.direnv/
+.envrc

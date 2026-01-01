@@ -1,0 +1,44 @@
+{
+  "nodes": {
+    "chip-go": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767259972,
+        "narHash": "sha256-BbNWhZ3Sp4mTWpnFex7Zyyi9eVpl+h7iM9bf7P/a7hQ=",
+        "ref": "refs/heads/main",
+        "rev": "770c61e858b396ae416e391a8a06c2d6487a7863",
+        "revCount": 84,
+        "type": "git",
+        "url": "https://codeberg.org/ideumi/chip-go"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/ideumi/chip-go"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1767116409,
+        "narHash": "sha256-5vKw92l1GyTnjoLzEagJy5V5mDFck72LiQWZSOnSicw=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "cad22e7d996aea55ecab064e84834289143e44a0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "chip-go": "chip-go",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}
