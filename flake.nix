@@ -43,41 +43,26 @@
               "thirdparty/runewidth/script"
             ];
             
-            # Patch hardcoded paths to point to Nix store
-            postPatch = ''
-              # Patch documentation directory constant
-              substituteInPlace internal/constants/doc.go \
-                --replace-fail '/usr/share/doc/chiplang' "$out/share/doc/chiplang"
-              
-              # Patch default library path in combine template
-              substituteInPlace cmd/chippy/combine.go \
-                --replace-fail '/usr/lib/chiplang' "$out/lib/chiplang"
-            '';
-            
             # Build only the chippy binary
             subPackages = [ "cmd/chippy" ];
             
             # Install additional files beyond the binary
             postInstall = ''
-              # Install standard library files
+              # Install standard library files (from original source)
               mkdir -p $out/lib/chiplang
               cp -r $src/lib/*.chh $out/lib/chiplang/
               
-              # Install documentation files
+              # Install documentation files (from patched source in PWD)
               mkdir -p $out/share/doc/chiplang
-              cp -r $src/doc/*.chpdoc $out/share/doc/chiplang/
+              cp -r doc/*.chpdoc $out/share/doc/chiplang/
               
               # Install IDE syntax files for user reference
               mkdir -p $out/share/chiplang/ide
               cp -r $src/ide/* $out/share/chiplang/ide/
-              
-              # Copy license files
-              cp $src/LICENCE.txt $out/share/doc/chiplang/
-              cp $src/LICENCES_THIRDPARTY.txt $out/share/doc/chiplang/
             '';
             
             meta = with pkgs.lib; {
-              description = "ChipLang (Chipmunk language) - A simple, modular scripting language";
+              description = "ChipLang (Chipmunk language) - Small interpreted programming language for scripting and tooling";
               longDescription = ''
                 ChipLang is an interpreted scripting/programming language written in Go.
                 It aims to create a simple, modular, low profile, understandable and 

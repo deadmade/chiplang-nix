@@ -1,0 +1,419 @@
+#!/usr/bin/chippy
+#
+# myprogram V-1.0.0
+#
+
+#
+# corelib - libhandles.chh
+#
+
+#@ <STDIN>
+#@ (2025-08-12)
+#@ UNIX' standard input handle
+
+var STDIN = 0;
+
+#@ <STDOUT>
+#@ (2025-08-12)
+#@ UNIX' standard output handle
+
+var STDOUT = 1;
+
+#@ <STDERR>
+#@ (2025-08-12)
+#@ UNIX' standard error output handle
+
+var STDERR = 2;
+
+#@ <SEEKSET>
+#@ (2025-11-08)
+#@ Seek from beginning of file
+
+var SEEKSET = 0;
+
+#@ <SEEKCUR>
+#@ (2025-11-08)
+#@ Seek from current position
+
+var SEEKCUR = 1;
+
+#@ <SEEKEND>
+#@ (2025-11-08)
+#@ Seek from end of file
+
+var SEEKEND = 2;
+
+#
+# corelib - libstrings.chh
+#
+
+#@ <Contains(value, needle)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Returns ''true'' if ''value'' contains ''needle'', ''false'' otherwise.
+
+func Contains(value, needle)
+{
+	if needle == "" { return false; }
+	return not iserr(indexof(value, needle));
+}
+
+#@ <StartsWith(value, prefix)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Returns ''true'' if ''value'' starts with the given ''prefix'', ''false'' otherwise.
+
+func StartsWith(value, prefix)
+{
+	if len(prefix) > len(value) { return false; }
+
+	return substr(value, 1, len(prefix)) == prefix;
+}
+
+#@ <EndsWith(value, suffix)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Returns ''true'' if ''value'' ends with the given ''suffix'', ''false'' otherwise.
+
+func EndsWith(value, suffix)
+{
+	if len(suffix) > len(value) { return false; }
+
+	var start = len(value) - len(suffix) + 1;
+
+	return substr(value, start, len(suffix)) == suffix;
+}
+
+#@ <Left(value, count)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Returns the leftmost ''count'' characters from ''value'', or
+#@ ''err'' if ''count'' is negative.
+
+func Left(value, count)
+{
+	if count < 0 { return err; }
+
+	if count > len(value) { return value; }
+
+	return substr(value, 1, count);
+}
+
+#@ <Right(value, count)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Returns the rightmost ''count'' characters from ''value'', or
+#@ ''err'' if ''count'' is negative.
+
+func Right(value, count)
+{
+	if count < 0 { return err; }
+
+	if count > len(value) { return value; }
+
+	var start = len(value) - count + 1;
+
+	return substr(value, start, count);
+}
+
+#@ <Reverse(value)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Returns ''value'' with characters in reverse order.
+
+func Reverse(value)
+{
+	var result = "";
+	var i = len(value);
+
+	while i >= 1
+	{
+		result = result + charat(value, i);
+		i = i - 1;
+	}
+
+	return result;
+}
+
+#@ <TrimLeft(value)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Removes whitespace characters from the beginning of ''value''.
+
+func TrimLeft(value)
+{
+	var i = 1;
+
+	while i <= len(value)
+	{
+		var ch = charat(value, i);
+
+		if ch != " " and ch != "\t" and ch != "\n" and ch != "\r"
+		{
+			break;
+		}
+
+		i = i + 1;
+	}
+
+	return substr(value, i, len(value) - i + 1);
+}
+
+#@ <TrimRight(value)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Removes whitespace characters from the end of ''value''.
+
+func TrimRight(value)
+{
+	var i = len(value);
+
+	while i >= 1
+	{
+		var ch = charat(value, i);
+
+		if ch != " " and ch != "\t" and ch != "\n" and ch != "\r"
+		{
+			break;
+		}
+
+		i = i - 1;
+	}
+
+	return substr(value, 1, i);
+}
+
+#@ <Trim(value)>
+#@ V-1.0.0 (2025-08-13)
+#@
+#@ Removes whitespace characters from the beginning and end of ''value''.
+
+func Trim(value)
+{
+	return TrimLeft(TrimRight(value));
+}
+
+#@ <SplitCollapse(value, delimiter)>
+#@ V-1.0.0 (2025-11-06)
+#@
+#@ Splits ''value'' on ''delimiter'' and collapses repeated delimiters.
+#@ Returns a list of non-empty strings.
+
+func SplitCollapse(value, delimiter)
+{
+	if delimiter == "" { return err; }
+
+	var trimmed = Trim(value);
+	if trimmed == "" { return []; }
+
+	var parts = split(trimmed, delimiter);
+	var result = [];
+
+	for i = 1 to len(parts)
+	{
+		var part = parts[i];
+
+		if part != ""
+		{
+			result = append(result, part);
+		}
+	}
+
+	return result;
+}
+
+#@ <Format(value, values)>
+#@ V-1.0.0 (2025-10-31)
+#@
+#@ Formats ''value'' by replacing format specifiers with ''values'' in order.
+#@ ''%s'' (string), ''%i'' (integer), ''%n'' (number), ''%%'' (literal %)
+#@
+#@ Returns ''err'' if specifiers don't match values count or if format is
+#@ invalid.
+
+func Format(value, values)
+{
+	if type(values) != "list" { return err; }
+
+	var parts = [];
+	var valIndex = 1;
+	var i = 1;
+
+	while i <= len(value)
+	{
+		var ch = charat(value, i);
+
+		if ch == "%"
+		{
+			if i + 1 <= len(value)
+			{
+				var next = charat(value, i + 1);
+
+				if next == "%"
+				{
+					parts = append(parts, "%");
+
+					i = i + 2;
+				}
+				elseif next == "s"
+				{
+					if valIndex > len(values) { return err; }
+
+					parts = append(parts, str(values[valIndex]));
+
+					valIndex = valIndex + 1;
+					i = i + 2;
+				}
+				elseif next == "i"
+				{
+					if valIndex > len(values) { return err; }
+
+					parts = append(parts, str(int(values[valIndex])));
+
+					valIndex = valIndex + 1;
+					i = i + 2;
+				}
+				elseif next == "n"
+				{
+					if valIndex > len(values) { return err; }
+
+					parts = append(parts, str(num(values[valIndex])));
+
+					valIndex = valIndex + 1;
+					i = i + 2;
+				}
+				else
+				{
+					return err;
+				}
+			}
+			else
+			{
+				return err;
+			}
+		}
+		else
+		{
+			parts = append(parts, ch);
+
+			i = i + 1;
+		}
+	}
+
+	if valIndex != len(values) + 1 { return err; }
+
+	return join(parts, "");
+}
+
+#
+# corelib - libprint.chh
+#
+
+
+#@ <Print(text)>
+#@ V-1.0.1 (2025-10-31)
+#@
+#@ Prints ''text'' to STDOUT.
+
+func Print(text)
+{
+	fwrite(pack(str(text)), STDOUT);
+}
+
+#@ <Println(text)>
+#@ V-1.0.1 (2025-10-31)
+#@
+#@ Prints ''text'' to STDOUT with trailing newline.
+
+func Println(text)
+{
+	Print(text + "\n");
+}
+
+#@ <Printe(text)>
+#@ V-1.0.1 (2025-10-31)
+#@
+#@ Prints ''text'' to STDERR.
+
+func Printe(text)
+{
+	fwrite(pack(str(text)), STDERR);
+}
+
+#@ <Printeln(text)>
+#@ V-1.0.1 (2025-10-31)
+#@
+#@ Prints ''text'' to STDERR with trailing newline.
+
+func Printeln(text)
+{
+	Printe(text + "\n");
+}
+
+#@ <Printf(text, values)>
+#@ V-1.0.0 (2025-10-31)
+#@
+#@ Prints ''text'' formatted with ''values'' to STDOUT.
+#@ See libstrings.chh ''Format(value, values)''.
+
+func Printf(text, values)
+{
+	var fmtStr = Format(str(text), values);
+	if iserr(fmtStr) { return err; }
+
+	Print(fmtStr);
+}
+
+#@ <Printfln(text, values)>
+#@ V-1.0.0 (2025-10-31)
+#@
+#@ Prints ''text'' formatted with ''values'' to STDOUT with
+#@ trailing newline.
+#@ See libstrings.chh ''Format(value, values)''.
+
+func Printfln(text, values)
+{
+	return Printf(text + "\n", values);
+}
+
+#@ <Printef(text, values)>
+#@ V-1.0.0 (2025-10-31)
+#@
+#@ Prints ''text'' formatted with ''values'' to STDERR.
+#@ See libstrings.chh ''Format(value, values)''.
+
+func Printef(text, values)
+{
+	var fmtStr = Format(str(text), values);
+	if iserr(fmtStr) { return err; }
+
+	Printe(fmtStr);
+}
+
+#@ <Printefln(text, values)>
+#@ V-1.0.0 (2025-10-31)
+#@
+#@ Prints ''text'' formatted with ''values'' to STDERR with
+#@ trailing newline.
+#@ See libstrings.chh ''Format(value, values)''.
+
+func Printefln(text, values)
+{
+	return Printef(text + "\n", values);
+}
+
+
+#
+# ChipLang Nix Package Test Script
+#
+# This script demonstrates the CHIP_LIB_PATH functionality
+# which allows libraries to be loaded from system paths.
+
+# Now we can load system libraries directly!
+# No need for absolute paths or being in the library directory
+
+Println("ChipLang Nix Package Test");
+Println("=========================");
+Println("");
+
+

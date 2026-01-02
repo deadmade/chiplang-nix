@@ -24,7 +24,8 @@ in
       example = "/etc/chiplang/lib";
       description = ''
         Additional library search path for ChipLang scripts.
-        This path will be available via the CHIP_LIB_DIR environment variable.
+        This path will be appended to CHIP_LIB_PATH, allowing you to
+        provide custom libraries alongside the system libraries.
       '';
     };
   };
@@ -33,17 +34,17 @@ in
     # Add chippy to system packages
     environment.systemPackages = [ cfg.package ];
     
-    # Set environment variables for convenience
-    environment.sessionVariables = mkMerge [
-      {
-        # Point to the Nix store locations
-        CHIP_LIB_DIR = "${cfg.package}/lib/chiplang";
-        CHIP_DOC_DIR = "${cfg.package}/share/doc/chiplang";
-      }
-      (mkIf (cfg.extraLibraryPath != null) {
-        CHIP_EXTRA_LIB_DIR = cfg.extraLibraryPath;
-      })
-    ];
+    # Set environment variables
+    environment.sessionVariables = {
+      # Library search path for load() builtin (colon-separated)
+      CHIP_LIB_PATH = 
+        if cfg.extraLibraryPath != null
+        then "${cfg.package}/lib/chiplang:${cfg.extraLibraryPath}"
+        else "${cfg.package}/lib/chiplang";
+      
+      # Documentation path for chippy doc
+      CHIP_DOC_DIR = "${cfg.package}/share/doc/chiplang";
+    };
   };
 
   meta = {
