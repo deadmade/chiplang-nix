@@ -14,6 +14,7 @@
       # Support common Linux systems
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
+      version = "1.0.7";
     in
     {
       packages = forAllSystems (system:
@@ -25,7 +26,7 @@
           
           chiplang = pkgs.buildGoModule rec {
             pname = "chiplang";
-            version = "1.0.7";
+            inherit version;
             
             src = chip-go;
             
@@ -48,17 +49,13 @@
             
             # Install additional files beyond the binary
             postInstall = ''
-              # Install standard library files (from original source)
+              # Install standard library files
               mkdir -p $out/lib/chiplang
               cp -r $src/lib/*.chh $out/lib/chiplang/
               
-              # Install documentation files (from patched source in PWD)
+              # Install documentation files
               mkdir -p $out/share/doc/chiplang
               cp -r doc/*.chpdoc $out/share/doc/chiplang/
-              
-              # Install IDE syntax files for user reference
-              mkdir -p $out/share/chiplang/ide
-              cp -r $src/ide/* $out/share/chiplang/ide/
             '';
             
             meta = with pkgs.lib; {
@@ -75,6 +72,73 @@
               mainProgram = "chippy";
               platforms = platforms.linux;
             };
+          };
+          
+          chiplang-nvim = pkgs.vimUtils.buildVimPlugin {
+            pname = "chiplang-nvim";
+            inherit version;
+            src = chip-go;
+            
+            # Restructure to vim plugin format (syntax/ and ftdetect/ at root)
+            postInstall = ''
+              # Move vim syntax files to plugin root
+              mkdir -p $out/syntax $out/ftdetect
+              cp $src/ide/vim/syntax/chiplang.vim $out/syntax/
+              cp $src/ide/vim/ftdetect/chiplang.vim $out/ftdetect/
+              
+              # Remove everything else
+              find $out -mindepth 1 -maxdepth 1 \
+                ! -name 'syntax' \
+                ! -name 'ftdetect' \
+                -exec rm -rf {} +
+            '';
+            
+            meta = with pkgs.lib; {
+              description = "Neovim syntax highlighting for ChipLang";
+              homepage = "https://codeberg.org/ideumi/chip-go";
+              license = licenses.bsd2;
+              platforms = platforms.linux;
+            };
+          };
+        });
+      
+      # Development shell with Neovim integration
+      devShells = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          chiplangPkg = self.packages.${system}.chiplang;
+          chiplangNvim = self.packages.${system}.chiplang-nvim;
+        in
+        {
+          default = pkgs.mkShell {
+            name = "chip-go-dev";
+            
+            buildInputs = with pkgs; [
+              go
+              gopls
+              chiplangPkg
+            ];
+            
+            shellHook = ''
+              echo "🐿️  ChipLang Development Environment v${version}"
+              echo ""
+              echo "  ChipLang: ${chiplangPkg}/bin/chippy"
+              echo "  Libraries: ${chiplangPkg}/lib/chiplang"
+              echo "  Documentation: ${chiplangPkg}/share/doc/chiplang"
+              echo ""
+              
+              # Make Neovim auto-discover ChipLang syntax
+              # Add the plugin to Neovim's runtime path
+              export VIMINIT="set runtimepath+=${chiplangNvim}"
+              
+              # Set ChipLang environment variables
+              export CHIP_LIB_PATH="${chiplangPkg}/lib/chiplang"
+              export CHIP_DOC_DIR="${chiplangPkg}/share/doc/chiplang"
+              
+              echo "✓ Neovim configured for .chp and .chh syntax highlighting"
+              echo "  (Set via VIMINIT environment variable)"
+              echo ""
+            '';
           };
         });
       
