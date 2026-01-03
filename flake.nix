@@ -7,9 +7,13 @@
       url = "git+https://codeberg.org/ideumi/chip-go";
       flake = false;
     };
+    boxflinger = {
+      url = "git+https://codeberg.org/ideumi/boxflinger";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, chip-go }:
+  outputs = { self, nixpkgs, chip-go, boxflinger }:
     let
       # Support common Linux systems
       systems = [ "x86_64-linux" "aarch64-linux" ];
@@ -29,6 +33,13 @@
             inherit version;
             
             src = chip-go;
+            
+            # Apply patches for CHIP_LIB_PATH support
+            patches = [
+              ./patches/0001-add-path-resolver-utility.patch
+              ./patches/0002-patch-load-function-for-CHIP_LIB_PATH.patch
+              ./patches/0003-patch-combine-command-for-CHIP_LIB_PATH.patch
+            ];
             
             # Go module vendoring hash
             # To update: set to empty string "", run `nix build`, 
@@ -100,6 +111,44 @@
               platforms = platforms.linux;
             };
           };
+          
+          boxflinger = pkgs.stdenv.mkDerivation {
+            pname = "chiplang-boxflinger";
+            version = "1.0.1";
+            
+            src = boxflinger;
+            
+            nativeBuildInputs = [ self.packages.${system}.chiplang ];
+            
+            buildPhase = ''
+              # Set environment so chippy can find standard libraries
+              export CHIP_LIB_PATH="${self.packages.${system}.chiplang}/lib/chiplang"
+              export CHIP_DOC_DIR="${self.packages.${system}.chiplang}/share/doc/chiplang"
+              
+              # Create output directory
+              mkdir -p out
+              
+              # Run chippy combine to build the library
+              chippy combine
+            '';
+            
+            installPhase = ''
+              mkdir -p $out/lib/chiplang
+              cp out/libboxflinger.chh $out/lib/chiplang/
+            '';
+            
+            meta = with pkgs.lib; {
+              description = "Boxflinger - A simple terminal UI library for ChipLang";
+              longDescription = ''
+                Boxflinger provides terminal UI widgets and drawing primitives for ChipLang,
+                including text input, menus, lists, radio buttons, checkboxes, sliders,
+                progress bars, and layout management.
+              '';
+              homepage = "https://codeberg.org/ideumi/boxflinger";
+              license = licenses.bsd2;
+              platforms = platforms.linux;
+            };
+          };
         });
       
       # Development shell with Neovim integration
@@ -108,6 +157,7 @@
           pkgs = nixpkgs.legacyPackages.${system};
           chiplangPkg = self.packages.${system}.chiplang;
           chiplangNvim = self.packages.${system}.chiplang-nvim;
+          boxflingerPkg = self.packages.${system}.boxflinger;
         in
         {
           default = pkgs.mkShell {
@@ -132,11 +182,12 @@
               export VIMINIT="set runtimepath+=${chiplangNvim}"
               
               # Set ChipLang environment variables
-              export CHIP_LIB_PATH="${chiplangPkg}/lib/chiplang"
+              export CHIP_LIB_PATH="${chiplangPkg}/lib/chiplang:${boxflingerPkg}/lib/chiplang"
               export CHIP_DOC_DIR="${chiplangPkg}/share/doc/chiplang"
               
               echo "✓ Neovim configured for .chp and .chh syntax highlighting"
               echo "  (Set via VIMINIT environment variable)"
+              echo "✓ Boxflinger terminal UI library available"
               echo ""
             '';
           };
@@ -148,6 +199,7 @@
       # Overlay for integrating into existing configurations
       overlays.default = final: prev: {
         chiplang = self.packages.${final.system}.chiplang;
+        chiplang-boxflinger = self.packages.${final.system}.boxflinger;
       };
     };
 }

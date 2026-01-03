@@ -1,0 +1,58 @@
+diff --git a/cmd/chippy/combine.go b/cmd/chippy/combine.go
+index 935580c..e8f4a5d 100644
+--- a/cmd/chippy/combine.go
++++ b/cmd/chippy/combine.go
+@@ -12,11 +12,11 @@ import (
+ 	"chip-go/internal/constants"
+ 	"chip-go/internal/context"
+ 	"chip-go/internal/roadrunner"
++	"chip-go/internal/utils"
+ 	"chip-go/internal/values"
+ 	"fmt"
+ 	"os"
+-	"path/filepath"
+ 	"regexp"
+ 	"sort"
+ 	"strings"
+ )
+@@ -399,7 +399,8 @@ func processDependencies(filename string, paths []string, external map[string]bo
+ 			resolvedPath := resolvePath(depPath, paths)
+ 
+ 			if resolvedPath == "" {
+-				return fmt.Errorf("dependency '%s' not found in search paths %v", depPath, paths)
++				searchPaths := utils.GetAllSearchPaths(paths)
++				return fmt.Errorf("dependency '%s' not found in searched paths: %v", depPath, searchPaths)
+ 			}
+ 
+ 			if !seen[resolvedPath] {
+@@ -417,29 +418,7 @@ func processDependencies(filename string, paths []string, external map[string]bo
+ }
+ 
+ func resolvePath(filename string, paths []string) string {
+-	// Clean the filename to normalize path separators and resolve . and .. elements
+-	filename = filepath.Clean(filename)
+-
+-	// If file exists as-is (relative to current directory or absolute path), return it
+-	if _, err := os.Stat(filename); err == nil {
+-		return filename
+-	}
+-
+-	// If no search paths specified, return empty
+-	if len(paths) == 0 {
+-		return ""
+-	}
+-
+-	// Search in each path
+-	for _, path := range paths {
+-		fullPath := filepath.Clean(filepath.Join(path, filename))
+-
+-		if _, err := os.Stat(fullPath); err == nil {
+-			return fullPath
+-		}
+-	}
+-
+-	return ""
++	return utils.ResolveLibraryPath(filename, paths)
+ }
+ 
+ func generateCombinedFile(config CombineConfig, files []string) error {

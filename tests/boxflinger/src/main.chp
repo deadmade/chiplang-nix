@@ -1,0 +1,386 @@
+#!/usr/bin/chippy
+
+load("libboxflinger.chh");
+load("libtermios.chh");
+load("form.chh");
+
+func TestTextInput()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 15, "TextInput Test");
+
+	BFDrawText(4, 4, "This tests single-line text input with cursor support.");
+	BFDrawText(4, 5, "Use arrow keys to move cursor, Backspace to delete.");
+	BFDrawText(4, 6, "Press Enter to submit, ESC to cancel.");
+
+	var name = BFTextInput(4, 9, 30, "Enter your name: ", "John Doe");
+
+	if iserr(name)
+	{
+		BFDrawText(4, 12, "Input cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 12, "You entered: " + name);
+	}
+
+	BFDrawText(4, 14, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestSelect()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 18, "Select Test");
+
+	BFDrawText(4, 4, "This tests list selection with scrolling.");
+	BFDrawText(4, 5, "Use Up/Down arrows to navigate, Enter to select, ESC to cancel.");
+
+	var items = [];
+	items = append(items, "Apple");
+	items = append(items, "Banana");
+	items = append(items, "Cherry");
+	items = append(items, "Date");
+	items = append(items, "Elderberry");
+	items = append(items, "Fig");
+	items = append(items, "Grape");
+	items = append(items, "Honeydew");
+	items = append(items, "Kiwi");
+	items = append(items, "Lemon");
+
+	BFDrawBox(4, 7, 40, 8, BFBOXSINGLE);
+	var selected = BFSelect(5, 8, 38, 6, items, 3);
+
+	if iserr(selected)
+	{
+		BFDrawText(4, 16, "Selection cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 16, "You selected: " + items[selected] + " (index " + str(selected) + ")");
+	}
+
+	BFDrawText(4, 17, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestMenu()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 16, "Menu Test");
+
+	BFDrawText(4, 4, "This tests vertical menu navigation.");
+	BFDrawText(4, 5, "Use Up/Down arrows to navigate, Enter to select.");
+
+	var items = [];
+	items = append(items, "New File");
+	items = append(items, "Open File");
+	items = append(items, "Save");
+	items = append(items, "Save As...");
+	items = append(items, "Exit");
+
+	var selected = BFMenu(20, 8, items, 1);
+
+	if iserr(selected)
+	{
+		BFDrawText(4, 14, "Menu cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 14, "You selected: " + items[selected]);
+	}
+
+	BFDrawText(4, 15, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestConfirm()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 12, "Confirm Test");
+
+	BFDrawText(4, 4, "This tests Yes/No confirmation dialogs.");
+	BFDrawText(4, 5, "Use arrow keys or Y/N keys to select, Enter to confirm.");
+
+	var result = BFConfirm(20, 8, "Do you want to continue?", true);
+
+	if iserr(result)
+	{
+		BFDrawText(4, 11, "Confirmation cancelled");
+	}
+	elseif result
+	{
+		BFDrawText(4, 11, "You chose: Yes");
+	}
+	else
+	{
+		BFDrawText(4, 11, "You chose: No");
+	}
+
+	BFDrawText(4, 12, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestNumberInput()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 14, "NumberInput Test");
+
+	BFDrawText(4, 4, "This tests numeric input with validation.");
+	BFDrawText(4, 5, "Only digits are accepted, value must be in range.");
+
+	var number = BFNumberInput(4, 8, "Enter age", 0, 120, 25);
+
+	if iserr(number)
+	{
+		BFDrawText(4, 11, "Input cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 11, "You entered: " + str(int(number)));
+	}
+
+	BFDrawText(4, 13, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestSlider()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 14, "Slider Test");
+
+	BFDrawText(4, 4, "This tests interactive slider with arrow keys.");
+	BFDrawText(4, 5, "Use Left/Right arrows to adjust, Enter to confirm.");
+
+	var volume = BFSlider(10, 8, 40, "Volume", 50, 0, 100, 5);
+
+	if iserr(volume)
+	{
+		BFDrawText(4, 11, "Input cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 11, "Volume set to: " + str(int(volume)) + "%");
+	}
+
+	BFDrawText(4, 13, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestCheckboxList()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 20, "CheckboxList Test");
+
+	BFDrawText(4, 4, "This tests multiple selection with checkboxes.");
+	BFDrawText(4, 5, "Use Up/Down arrows, Space to toggle, Enter to confirm.");
+
+	var items = [];
+	items = append(items, "Enable logging");
+	items = append(items, "Enable debug mode");
+	items = append(items, "Enable auto-save");
+	items = append(items, "Enable spell check");
+	items = append(items, "Enable syntax highlighting");
+	items = append(items, "Enable line numbers");
+	items = append(items, "Enable word wrap");
+
+	var defaultChecked = [1, 3, 5];
+
+	BFDrawBox(4, 7, 50, 9, BFBOXSINGLE);
+	var checked = BFCheckboxList(5, 8, 48, 7, items, defaultChecked);
+
+	if iserr(checked)
+	{
+		BFDrawText(4, 22, "Selection cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 22, "You selected " + str(len(checked)) + " items:");
+
+		for i = 1 to len(checked)
+		{
+			var idx = checked[i];
+			BFDrawText(6, 22 + i, "- " + items[idx]);
+		}
+	}
+
+	BFDrawText(4, 22 + len(checked) + 1, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestRadioGroup()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 16, "RadioGroup Test");
+
+	BFDrawText(4, 4, "This tests single selection with radio buttons.");
+	BFDrawText(4, 5, "Use Up/Down arrows to select, Enter to confirm.");
+
+	var items = [];
+	items = append(items, "Small");
+	items = append(items, "Medium");
+	items = append(items, "Large");
+	items = append(items, "Extra Large");
+
+	var selected = BFRadioGroup(20, 8, items, 2);
+
+	if iserr(selected)
+	{
+		BFDrawText(4, 14, "Selection cancelled");
+	}
+	else
+	{
+		BFDrawText(4, 14, "You selected: " + items[selected]);
+	}
+
+	BFDrawText(4, 15, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func TestTextBox()
+{
+	ClearScreen();
+	HideCursor();
+
+	BFDrawFrame(2, 2, 70, 20, "TextBox Test");
+
+	BFDrawText(4, 4, "This tests multi-line text editor with scrolling.");
+	BFDrawText(4, 5, "Use arrow keys to navigate, Enter for new line.");
+	BFDrawText(4, 6, "Backspace to delete. Ctrl+D to finish, ESC to cancel.");
+
+	var defaultText = "Sample text.";
+
+	var text = BFTextBox(10, 8, 50, 12, "Text Editor", defaultText);
+
+	if iserr(text)
+	{
+		BFDrawText(4, 21, "Editing cancelled");
+	}
+	else
+	{
+		var lines = split(text, "\n");
+		BFDrawText(4, 21, "You entered " + str(len(lines)) + " lines (" + str(len(text)) + " chars)");
+	}
+
+	BFDrawText(4, 22, "Press any key to continue...");
+	ShowCursor();
+
+	getch();
+}
+
+func ShowMenu()
+{
+	ClearScreen();
+
+	BFDrawFrame(15, 2, 50, 22, "Boxflinger Test");
+
+	BFDrawText(17, 4, "Choose a test:");
+	BFDrawText(17, 6, " 1. TextInput");
+	BFDrawText(17, 7, " 2. Select");
+	BFDrawText(17, 8, " 3. Menu");
+	BFDrawText(17, 9, " 4. Confirm Dialog");
+	BFDrawText(17, 10, " 5. NumberInput");
+	BFDrawText(17, 11, " 6. Slider");
+	BFDrawText(17, 12, " 7. CheckboxList");
+	BFDrawText(17, 13, " 8. RadioGroup");
+	BFDrawText(17, 14, " 9. TextBox");
+	BFDrawText(17, 15, " A. Form Demo");
+	BFDrawText(17, 16, " 0. Exit");
+
+	BFDrawText(17, 18, "Press 1-9, A, 0 (exit), or Q to select:");
+
+	var key = getch();
+	var choice = unpack(key);
+
+	if choice == "1"
+	{
+		TestTextInput();
+	}
+	elseif choice == "2"
+	{
+		TestSelect();
+	}
+	elseif choice == "3"
+	{
+		TestMenu();
+	}
+	elseif choice == "4"
+	{
+		TestConfirm();
+	}
+	elseif choice == "5"
+	{
+		TestNumberInput();
+	}
+	elseif choice == "6"
+	{
+		TestSlider();
+	}
+	elseif choice == "7"
+	{
+		TestCheckboxList();
+	}
+	elseif choice == "8"
+	{
+		TestRadioGroup();
+	}
+	elseif choice == "9"
+	{
+		TestTextBox();
+	}
+	elseif choice == "a" or choice == "A"
+	{
+		TestForm();
+	}
+	elseif choice == "0" or choice == "q" or choice == "Q"
+	{
+		return false;
+	}
+
+	return true;
+}
+
+func Main()
+{
+	SetTitle("Boxflinger Demo");
+
+	while ShowMenu() { }
+
+	ClearScreen();
+	ShowCursor();
+}
+
+Main();
+

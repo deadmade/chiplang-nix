@@ -1,0 +1,45 @@
+#!/usr/bin/chippy
+#
+# Combine configuration file
+#
+
+# Metadata
+
+var Project = "bftest";
+var Version = "1.0.0";
+var Licence = "../../LICENCE.txt";
+var Output = "bftest";
+
+# Entry point
+
+var Source = "src/main.chp";
+
+# Search paths for dependencies
+
+var Paths = [];
+Paths = Paths + ["src"];
+Paths = Paths + ["src/lib"];
+Paths = Paths + ["../../out"];
+Paths = Paths + ["../../lib"];
+
+# Add user-local library path if HOME is available
+
+var homePath = getenv("HOME");
+
+if not iserr(homePath)
+{
+    Paths = Paths + [homePath + "/.local/share/chiplang/lib"];
+}
+
+Paths = Paths + ["/usr/lib/chiplang"];
+
+# Dependencies combine shouldn't bundle and just keep as loads
+
+var External = [];
+
+# Options
+
+var StripComments = false;
+var StripWhitespace = false;
+var AddShebang = true;
+

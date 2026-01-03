@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "boxflinger": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1767261231,
+        "narHash": "sha256-DQaWI3hRdkMFa3d3R///huEpd1ljJTzc2d0nd+prS7E=",
+        "ref": "refs/heads/main",
+        "rev": "846a46d733c4c069f77b8d04f268733fff94b483",
+        "revCount": 3,
+        "type": "git",
+        "url": "https://codeberg.org/ideumi/boxflinger"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/ideumi/boxflinger"
+      }
+    },
     "chip-go": {
       "flake": false,
       "locked": {
@@ -18,11 +34,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1767116409,
-        "narHash": "sha256-5vKw92l1GyTnjoLzEagJy5V5mDFck72LiQWZSOnSicw=",
+        "lastModified": 1767379071,
+        "narHash": "sha256-EgE0pxsrW9jp9YFMkHL9JMXxcqi/OoumPJYwf+Okucw=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "cad22e7d996aea55ecab064e84834289143e44a0",
+        "rev": "fb7944c166a3b630f177938e478f0378e64ce108",
         "type": "github"
       },
       "original": {
@@ -34,6 +50,7 @@
     },
     "root": {
       "inputs": {
+        "boxflinger": "boxflinger",
         "chip-go": "chip-go",
         "nixpkgs": "nixpkgs"
       }

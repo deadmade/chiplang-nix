@@ -1,0 +1,63 @@
+diff --git a/internal/builtins/load.go b/internal/builtins/load.go
+index 514d7e3..b1c9041 100644
+--- a/internal/builtins/load.go
++++ b/internal/builtins/load.go
+@@ -10,8 +10,11 @@ import (
+ 	"chip-go/internal/builtins/shared"
+ 	"chip-go/internal/constants"
+ 	"chip-go/internal/errors"
++	"chip-go/internal/utils"
+ 	"chip-go/internal/values"
++	"fmt"
+ 	"os"
++	"strings"
+ )
+ 
+ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
+@@ -43,14 +46,27 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
+ 		))
+ 	}
+ 
+-	content, err := os.ReadFile(filename.Value)
++	resolvedPath := utils.ResolveLibraryPath(filename.Value, nil)
++
++	if resolvedPath == "" {
++		posStart, posEnd := args[0].GetPos()
++		searchPaths := utils.GetAllSearchPaths(nil)
++
++		return res.Failure(errors.NewRTError(
++			posStart, posEnd,
++			fmt.Sprintf("Failed to load file \"%s\": not found in searched paths: [%s]", filename.Value, strings.Join(searchPaths, ", ")),
++			ctx,
++		))
++	}
++
++	content, err := os.ReadFile(resolvedPath)
+ 
+ 	if err != nil {
+ 		posStart, posEnd := args[0].GetPos()
+ 
+ 		return res.Failure(errors.NewRTError(
+ 			posStart, posEnd,
+-			"Failed to load file \""+filename.Value+"\": "+err.Error(),
++			"Failed to read file \""+resolvedPath+"\": "+err.Error(),
+ 			ctx,
+ 		))
+ 	}
+@@ -67,14 +83,14 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
+ 		))
+ 	}
+ 
+-	_, err = roadRunner.Run(filename.Value, string(content))
++	_, err = roadRunner.Run(resolvedPath, string(content))
+ 
+ 	if err != nil {
+ 		posStart, posEnd := args[0].GetPos()
+ 
+ 		return res.Failure(errors.NewRTError(
+ 			posStart, posEnd,
+-			"Failed to execute file \""+filename.Value+"\":\n"+err.Error(),
++			"Failed to execute file \""+resolvedPath+"\":\n"+err.Error(),
+ 			ctx,
+ 		))
+ 	}

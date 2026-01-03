@@ -1,0 +1,41 @@
+#!/usr/bin/chippy
+#
+# Combine configuration file
+#
+
+# Metadata
+
+var Project = "myprogram";
+var Version = "1.0.0";
+var Licence = "licence.txt";
+var Output = "myprogram";
+
+# Entry point
+
+var Source = "main.chp";
+
+# Search paths for dependencies
+
+var Paths = [];
+Paths = Paths + ["src/lib"];
+
+# Add user-local library path if HOME is available
+
+var homePath = getenv("HOME");
+
+if not iserr(homePath)
+{
+    Paths = Paths + [homePath + "/.local/share/chiplang/lib"];
+}
+
+Paths = Paths + ["/usr/lib/chiplang"];
+
+# Dependencies combine shouldn't bundle and just keep as loads
+
+var External = [];
+
+# Options
+
+var StripComments = true;
+var StripWhitespace = true;
+var AddShebang = true;

@@ -2,9 +2,6 @@
 result
 result-*
 
-# Flake lock (optional - can be tracked if you want to pin versions)
-# flake.lock
-
 # Editor files
 .vscode/
 .idea/
@@ -15,4 +12,18 @@ result-*
 
 # Nix-specific
 .direnv/
-.envrc
+
+# ChipLang compiled binaries
+bftest
+myprogram
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.tmp
+
+# ChipLang temporary/cache files
+*.chp.tmp
+*.chh.tmp

@@ -28,6 +28,19 @@ in
         provide custom libraries alongside the system libraries.
       '';
     };
+
+    boxflinger = {
+      enable = mkEnableOption "Boxflinger terminal UI library for ChipLang";
+
+      package = mkOption {
+        type = types.package;
+        default = pkgs.chiplang-boxflinger;
+        defaultText = literalExpression "pkgs.chiplang-boxflinger";
+        description = ''
+          The Boxflinger package to use.
+        '';
+      };
+    };
   };
 
   config = mkIf cfg.enable {
@@ -38,9 +51,14 @@ in
     environment.sessionVariables = {
       # Library search path for load() builtin (colon-separated)
       CHIP_LIB_PATH = 
-        if cfg.extraLibraryPath != null
-        then "${cfg.package}/lib/chiplang:${cfg.extraLibraryPath}"
-        else "${cfg.package}/lib/chiplang";
+        let
+          basePath = "${cfg.package}/lib/chiplang";
+          boxflingerPath = optionalString cfg.boxflinger.enable 
+            ":${cfg.boxflinger.package}/lib/chiplang";
+          extraPath = optionalString (cfg.extraLibraryPath != null) 
+            ":${cfg.extraLibraryPath}";
+        in
+          basePath + boxflingerPath + extraPath;
       
       # Documentation path for chippy doc
       CHIP_DOC_DIR = "${cfg.package}/share/doc/chiplang";

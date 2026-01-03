@@ -1,0 +1,84 @@
+diff --git a/internal/utils/pathresolver.go b/internal/utils/pathresolver.go
+new file mode 100644
+index 0000000..1e09420
+--- /dev/null
++++ b/internal/utils/pathresolver.go
+@@ -0,0 +1,78 @@
++/*
++ *
++ * RR2 - internal/utils/pathresolver.go
++ *
++ */
++
++package utils
++
++import (
++	"os"
++	"path/filepath"
++	"strings"
++)
++
++// GetChipLibPaths returns paths from CHIP_LIB_PATH environment variable
++// Split by colon (:) separator
++func GetChipLibPaths() []string {
++	chipLibPath := os.Getenv("CHIP_LIB_PATH")
++	if chipLibPath == "" {
++		return []string{}
++	}
++
++	paths := strings.Split(chipLibPath, ":")
++	var result []string
++
++	for _, path := range paths {
++		path = strings.TrimSpace(path)
++
++		if path != "" {
++			result = append(result, path)
++		}
++	}
++
++	return result
++}
++
++// ResolveLibraryPath resolves a library file path
++// Search order: as-is (current dir/absolute) → CHIP_LIB_PATH → additionalPaths
++func ResolveLibraryPath(filename string, additionalPaths []string) string {
++	filename = filepath.Clean(filename)
++
++	// Check if file exists as-is (relative to cwd or absolute)
++	if _, err := os.Stat(filename); err == nil {
++		return filename
++	}
++
++	// Check CHIP_LIB_PATH directories
++	chipLibPaths := GetChipLibPaths()
++
++	for _, path := range chipLibPaths {
++		fullPath := filepath.Clean(filepath.Join(path, filename))
++
++		if _, err := os.Stat(fullPath); err == nil {
++			return fullPath
++		}
++	}
++
++	// Check additional paths (for combine command)
++	for _, path := range additionalPaths {
++		fullPath := filepath.Clean(filepath.Join(path, filename))
++
++		if _, err := os.Stat(fullPath); err == nil {
++			return fullPath
++		}
++	}
++
++	return ""
++}
++
++// GetAllSearchPaths returns all paths that would be searched
++// Useful for error reporting
++func GetAllSearchPaths(additionalPaths []string) []string {
++	result := []string{"."}
++	result = append(result, GetChipLibPaths()...)
++	result = append(result, additionalPaths...)
++
++	return result
++}
