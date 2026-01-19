@@ -18,7 +18,7 @@
       # Support common Linux systems
       systems = [ "x86_64-linux" "aarch64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
-      version = "1.0.8";
+      version = "1.0.9";
     in
     {
       packages = forAllSystems (system:
