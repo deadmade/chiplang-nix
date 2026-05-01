@@ -19,11 +19,11 @@
     "chip-go": {
       "flake": false,
       "locked": {
-        "lastModified": 1768722865,
-        "narHash": "sha256-KdVqyZIinEUd7dzcWOVVZUc/m3ricedG2L3dI2uLQdU=",
+        "lastModified": 1777093345,
+        "narHash": "sha256-5uYr0vuMtajkCU2bPACKRjysHZJH0dQkWoD5YUtprqQ=",
         "ref": "refs/heads/main",
-        "rev": "7781132c9e57aede692e1921f93a223054bb029d",
-        "revCount": 104,
+        "rev": "6837c770aa5a840813ffcd54b794f2ea1d9d8a69",
+        "revCount": 176,
         "type": "git",
         "url": "https://codeberg.org/ideumi/chip-go"
       },

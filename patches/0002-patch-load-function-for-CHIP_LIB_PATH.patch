@@ -1,11 +1,11 @@
 diff --git a/internal/builtins/load.go b/internal/builtins/load.go
-index 514d7e3..b1c9041 100644
+index 2e1d695..5f10432 100644
 --- a/internal/builtins/load.go
 +++ b/internal/builtins/load.go
-@@ -10,8 +10,11 @@ import (
- 	"chip-go/internal/builtins/shared"
+@@ -11,8 +11,11 @@ import (
  	"chip-go/internal/constants"
  	"chip-go/internal/errors"
+ 	"chip-go/internal/orchestrator"
 +	"chip-go/internal/utils"
  	"chip-go/internal/values"
 +	"fmt"
@@ -14,7 +14,7 @@ index 514d7e3..b1c9041 100644
  )
  
  func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
-@@ -43,14 +46,27 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
+@@ -44,14 +47,27 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
  		))
  	}
  
@@ -44,7 +44,7 @@ index 514d7e3..b1c9041 100644
  			ctx,
  		))
  	}
-@@ -67,14 +83,14 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
+@@ -68,14 +84,14 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
  		))
  	}
  
