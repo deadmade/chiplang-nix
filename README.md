@@ -1,79 +1,39 @@
-# chiplang-nix
+# chiplang-nix {#chiplang-nix}
 
-Nix flake for [ChipLang](https://codeberg.org/ideumi/chip-go) - A simple, modular scripting language.
+Nix flake packaging for [ChipLang](https://codeberg.org/ideumi/chip-go), the `chippy` interpreter, its standard library assets, and related tooling.
 
-## Packages
+## Packages {#chiplang-nix-packages}
 
-This flake provides:
-- `chiplang` - The ChipLang interpreter (`chippy` binary) with standard library and documentation
-- `chiplang-nvim` - Neovim/Vim plugin for ChipLang syntax highlighting
+This flake exports these package attributes on supported Linux systems:
 
-## Quick Start
+- `chiplang` - the `chippy` interpreter plus standard library and documentation files
+- `chiplang-boxflinger` - the Boxflinger terminal UI library packaged for `CHIP_LIB_PATH`
+- `boxflinger` - compatibility alias for `chiplang-boxflinger`
+- `chiplang-nvim` - Vim/Neovim runtime files for ChipLang syntax highlighting
+- `depthfinder` - the `dfn` terminal file manager
+- `default` - alias for `chiplang`
 
-### Try Without Installing
+## Quick Start {#chiplang-nix-quick-start}
+
+Run the interpreter without installing it:
 
 ```bash
-# Run the REPL
 nix run github:deadmade/chiplang-nix
-
-# Run a one-liner
-nix run github:deadmade/chiplang-nix -- -r 'fwrite(pack("Hello from ChipLang!") + b[10], 1);'
-
-# Check version
 nix run github:deadmade/chiplang-nix -- --version
 ```
 
-### Install to Your Profile
-
-## Usage
-
-### NixOS System Configuration
-
-Add to your `flake.nix`:
-
-```nix
-{
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    chiplang-nix.url = "github:deadmade/chiplang-nix";
-  };
-
-  outputs = { self, nixpkgs, chiplang-nix }: {
-    nixosConfigurations.yourhostname = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        chiplang-nix.nixosModules.default
-        {
-          programs.chiplang.enable = true;
-        }
-        # ... your other configuration
-      ];
-    };
-  };
-}
-```
-
-### Development Shell for ChipLang Development
-
-For working on ChipLang itself, use the provided development shell:
+Open a development shell with ChipLang and Go tooling:
 
 ```bash
-cd chip-go
-nix develop ./chiplang-nix
+nix develop github:deadmade/chiplang-nix
 ```
 
-This provides:
-- Go toolchain with `gopls` LSP
-- Pre-built ChipLang binary (`chippy`)
-- ChipLang standard library (`CHIP_LIB_PATH`)
-- ChipLang documentation (`CHIP_DOC_DIR`)
-- **Automatic Neovim syntax highlighting** for `.chp` and `.chh` files
+The dev shell provides `chippy`, `dfn`, and Go tooling, and sets:
 
-The devShell sets `NVIM_EXTRA_RUNTIME` to enable ChipLang syntax highlighting in Neovim automatically when you open `.chp` or `.chh` files.
+- `CHIP_LIB_PATH` to the packaged ChipLang standard library plus Boxflinger
+- `CHIP_DOC_DIR` to the packaged ChipLang documentation directory
 
-### Development Shell for Your ChipLang Projects
-
-Add to your project's `flake.nix`:
+## Use in Your Flake {#chiplang-nix-use-in-your-flake}
 
 ```nix
 {
@@ -82,50 +42,78 @@ Add to your project's `flake.nix`:
     chiplang-nix.url = "github:deadmade/chiplang-nix";
   };
 
-  outputs = { self, nixpkgs, chiplang-nix }: {
-    devShells.x86_64-linux.default = 
+  outputs = { nixpkgs, chiplang-nix, ... }: {
+    devShells.x86_64-linux.default =
       let
         pkgs = nixpkgs.legacyPackages.x86_64-linux;
       in
       pkgs.mkShell {
         buildInputs = [
-          chiplang-nix.packages.x86_64-linux.default
+          chiplang-nix.packages.x86_64-linux.chiplang
+          chiplang-nix.packages.x86_64-linux.chiplang-boxflinger
         ];
       };
   };
 }
 ```
 
-### Neovim Integration
+## NixOS Module {#chiplang-nix-nixos-module}
 
-The flake provides a `chiplang-nvim` package for syntax highlighting in Neovim/Vim.
-
-#### Option 1: Automatic (via devShell)
-When using `nix develop ./chiplang-nix` in the chip-go repository, Neovim will automatically detect ChipLang syntax - no configuration needed!
-
-#### Option 2: Manual Installation (Nixvim/Home Manager)
-Add to your Neovim configuration:
+Import the module directly from the flake. It defaults to this flake's packaged outputs and does not require the overlay.
 
 ```nix
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     chiplang-nix.url = "github:deadmade/chiplang-nix";
-    nixvim.url = "github:nix-community/nixvim";
   };
 
-  outputs = { nixvim, chiplang-nix, ... }: {
-    programs.neovim = {
-      enable = true;
-      plugins = [ chiplang-nix.packages.x86_64-linux.chiplang-nvim ];
+  outputs = { nixpkgs, chiplang-nix, ... }: {
+    nixosConfigurations.host = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        chiplang-nix.nixosModules.default
+        {
+          programs.chiplang.enable = true;
+          programs.chiplang.boxflinger.enable = true;
+        }
+      ];
     };
   };
 }
 ```
 
-The plugin provides:
-- Syntax highlighting for `.chp` (ChipLang scripts) and `.chh` (ChipLang headers)
-- Keyword recognition (var, func, return, if, for, while, etc.)
-- Built-in function highlighting
-- String and number highlighting
-- Comment support with TODO/FIXME/NOTE markers
+When enabled, the module:
+
+- installs the selected `chiplang` package into `environment.systemPackages`
+- sets `CHIP_LIB_PATH` to the ChipLang library path and, optionally, the Boxflinger library path
+- sets `CHIP_DOC_DIR` to the selected ChipLang package documentation path
+
+## Overlay {#chiplang-nix-overlay}
+
+The overlay exports:
+
+- `chiplang`
+- `chiplang-boxflinger`
+- `boxflinger`
+- `chiplang-nvim`
+- `depthfinder`
+
+## Editor Support {#chiplang-nix-editor-support}
+
+`chiplang-nvim` contains the Vim runtime files at:
+
+- `syntax/chiplang.vim`
+- `ftdetect/chiplang.vim`
+
+Use it from your preferred Vim or Neovim Nix configuration by adding the package as a plugin or runtime path entry.
+
+## Validation {#chiplang-nix-validation}
+
+`nix flake check` evaluates all exported outputs and runs explicit smoke checks for:
+
+- `chiplang` interpreter execution
+- `chiplang-boxflinger` library installation
+- `chiplang-nvim` runtime file layout
+- `depthfinder` binary layout
+- `nixosModules.default` environment variable wiring
