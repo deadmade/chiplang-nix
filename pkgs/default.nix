@@ -1,4 +1,4 @@
-{ pkgs, chip-go, boxflingerSrc, versions }:
+{ pkgs, chip-go, boxflingerSrc, depthfinderSrc, versions }:
 
 let
   lib = pkgs.lib;
@@ -102,6 +102,44 @@ rec {
       '';
       homepage = "https://codeberg.org/ideumi/boxflinger";
       license = lib.licenses.bsd2;
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  depthfinder = pkgs.stdenv.mkDerivation {
+    pname = "depthfinder";
+    version = versions.depthfinder;
+
+    src = depthfinderSrc;
+
+    nativeBuildInputs = [ chiplang pkgs.makeWrapper ];
+
+    buildPhase = ''
+      export CHIP_LIB_PATH="${chiplang}/lib/chiplang"
+      export CHIP_DOC_DIR="${chiplang}/share/doc/chiplang"
+
+      mkdir -p out
+      chippy combine
+    '';
+
+    installPhase = ''
+      mkdir -p $out/bin $out/libexec/depthfinder
+      cp out/dfn $out/libexec/depthfinder/dfn.chp
+      makeWrapper ${chiplang}/bin/chippy $out/bin/dfn \
+        --add-flags "$out/libexec/depthfinder/dfn.chp"
+    '';
+
+    meta = {
+      description = "Terminal-based file manager written in ChipLang";
+      longDescription = ''
+        depthfinder (dfn) is a two-panel terminal file manager with zero-config
+        design. Supports copy, cut, paste, delete, rename, bulk rename, multi-select,
+        interactive search/sort, color-coded file types, and customisable file
+        associations.
+      '';
+      homepage = "https://codeberg.org/ideumi/depthfinder";
+      license = lib.licenses.bsd2;
+      mainProgram = "dfn";
       platforms = lib.platforms.linux;
     };
   };

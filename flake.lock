@@ -32,6 +32,22 @@
         "url": "https://codeberg.org/ideumi/chip-go"
       }
     },
+    "depthfinder-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777094907,
+        "narHash": "sha256-2R/GGhTA3ZE4O2ldWLsAclkkDp8hZPwLGF6c77QwLyQ=",
+        "ref": "refs/heads/main",
+        "rev": "6065ed29c4d35b04e418c2315d11f4c71a07755f",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://codeberg.org/ideumi/depthfinder"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://codeberg.org/ideumi/depthfinder"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1768564909,
@@ -52,6 +68,7 @@
       "inputs": {
         "boxflinger": "boxflinger",
         "chip-go": "chip-go",
+        "depthfinder-src": "depthfinder-src",
         "nixpkgs": "nixpkgs"
       }
     }

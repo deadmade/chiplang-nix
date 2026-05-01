@@ -46,6 +46,11 @@ in
     touch "$out"
   '';
 
+  depthfinder-layout = pkgs.runCommand "depthfinder-layout" {} ''
+    test -f "${packages.depthfinder}/bin/dfn"
+    touch "$out"
+  '';
+
   nixos-module-eval = pkgs.runCommand "nixos-module-eval" {
     inherit systemPackagePaths sessionVariables;
   } ''

@@ -11,9 +11,13 @@
       url = "git+https://codeberg.org/ideumi/boxflinger";
       flake = false;
     };
+    depthfinder-src = {
+      url = "git+https://codeberg.org/ideumi/depthfinder";
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, chip-go, boxflinger }:
+  outputs = inputs@{ self, nixpkgs, chip-go, boxflinger, depthfinder-src }:
     let
       lib = nixpkgs.lib;
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -22,11 +26,13 @@
       versions = {
         chiplang = "1.0.16";
         boxflinger = "1.0.1";
+        depthfinder = "1.0.0";
       };
 
       makePackages = pkgs: import ./pkgs {
         inherit pkgs chip-go versions;
         boxflingerSrc = boxflinger;
+        depthfinderSrc = depthfinder-src;
       };
     in
     {
@@ -77,7 +83,7 @@
           packages = makePackages final;
         in
         {
-          inherit (packages) chiplang chiplang-nvim chiplang-boxflinger boxflinger;
+          inherit (packages) chiplang chiplang-nvim chiplang-boxflinger boxflinger depthfinder;
         };
     };
 }
