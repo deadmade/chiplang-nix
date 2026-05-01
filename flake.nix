@@ -52,6 +52,7 @@
               gopls
               packages.chiplang
               packages.chiplang-boxflinger
+              packages.depthfinder
             ];
 
             shellHook = ''
