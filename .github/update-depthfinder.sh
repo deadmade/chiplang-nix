@@ -34,7 +34,7 @@ if [ -z "$LATEST_TAG" ]; then
   exit 0
 fi
 
-LATEST_VERSION="${LATEST_TAG#v}"
+LATEST_VERSION=$(echo "$LATEST_TAG" | sed 's/^[Vv]-\{0,1\}//')
 CURRENT_VERSION=$(grep "${VERSION_KEY} = \"" "${FLAKE_NIX}" | sed 's/.*"\(.*\)".*/\1/')
 
 echo "Current: ${CURRENT_VERSION}  Latest: ${LATEST_VERSION}"
@@ -56,7 +56,7 @@ fi
 sed -i "s/${VERSION_KEY} = \"${CURRENT_VERSION}\"/${VERSION_KEY} = \"${LATEST_VERSION}\"/" "${FLAKE_NIX}"
 
 # Pin flake input to the new tag
-sed -i "s|url = \"${BASE_URL}[^\"]*\"|url = \"${BASE_URL}?ref=${LATEST_TAG}\"|" "${FLAKE_NIX}"
+sed -i "s|url = \"${BASE_URL}[^\"]*\"|url = \"${BASE_URL}?ref=refs/tags/${LATEST_TAG}\"|" "${FLAKE_NIX}"
 
 # Update lock file
 nix flake update "${FLAKE_INPUT}"
