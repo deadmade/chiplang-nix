@@ -26,7 +26,7 @@
       versions = {
         chiplang = "1.0.16";
         boxflinger = "1.0.1";
-        depthfinder = "1.0.0";
+        depthfinder = "1.0.1";
       };
 
       makePackages = pkgs: import ./pkgs {

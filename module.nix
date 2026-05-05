@@ -1,72 +1,61 @@
+flake:
 { config, lib, pkgs, ... }:
-
-with lib;
 
 let
   cfg = config.programs.chiplang;
+  flakePackages = flake.packages.${pkgs.stdenv.hostPlatform.system};
 in
 {
   options.programs.chiplang = {
-    enable = mkEnableOption "ChipLang scripting language";
+    enable = lib.mkEnableOption "ChipLang scripting language";
 
-    package = mkOption {
-      type = types.package;
-      default = pkgs.chiplang;
-      defaultText = literalExpression "pkgs.chiplang";
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = flakePackages.chiplang;
+      defaultText = lib.literalExpression "chiplang-nix.packages.\${pkgs.system}.chiplang";
       description = ''
-        The ChipLang package to use.
+        ChipLang package to install and expose through the runtime environment.
       '';
     };
 
-    extraLibraryPath = mkOption {
-      type = types.nullOr types.str;
+    extraLibraryPath = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
       default = null;
       example = "/etc/chiplang/lib";
       description = ''
-        Additional library search path for ChipLang scripts.
-        This path will be appended to CHIP_LIB_PATH, allowing you to
-        provide custom libraries alongside the system libraries.
+        Extra library search path appended to `CHIP_LIB_PATH`.
       '';
     };
 
     boxflinger = {
-      enable = mkEnableOption "Boxflinger terminal UI library for ChipLang";
+      enable = lib.mkEnableOption "the Boxflinger terminal UI library for ChipLang";
 
-      package = mkOption {
-        type = types.package;
-        default = pkgs.chiplang-boxflinger;
-        defaultText = literalExpression "pkgs.chiplang-boxflinger";
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = flakePackages.chiplang-boxflinger;
+        defaultText = lib.literalExpression "chiplang-nix.packages.\${pkgs.system}.chiplang-boxflinger";
         description = ''
-          The Boxflinger package to use.
+          Boxflinger package to add to the ChipLang library search path.
         '';
       };
     };
   };
 
-  config = mkIf cfg.enable {
-    # Add chippy to system packages
+  config = lib.mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
-    
-    # Set environment variables
-    environment.sessionVariables = {
-      # Library search path for load() builtin (colon-separated)
-      CHIP_LIB_PATH = 
-        let
-          basePath = "${cfg.package}/lib/chiplang";
-          boxflingerPath = optionalString cfg.boxflinger.enable 
-            ":${cfg.boxflinger.package}/lib/chiplang";
-          extraPath = optionalString (cfg.extraLibraryPath != null) 
-            ":${cfg.extraLibraryPath}";
-        in
-          basePath + boxflingerPath + extraPath;
-      
-      # Documentation path for chippy doc
-      CHIP_DOC_DIR = "${cfg.package}/share/doc/chiplang";
-    };
+
+    environment.sessionVariables =
+      let
+        libraryPaths =
+          [ "${cfg.package}/lib/chiplang" ]
+          ++ lib.optional cfg.boxflinger.enable "${cfg.boxflinger.package}/lib/chiplang"
+          ++ lib.optional (cfg.extraLibraryPath != null) cfg.extraLibraryPath;
+      in
+      {
+        CHIP_LIB_PATH = lib.concatStringsSep ":" libraryPaths;
+        CHIP_DOC_DIR = "${cfg.package}/share/doc/chiplang";
+      };
   };
 
-  meta = {
-    maintainers = with lib.maintainers; [ ];
-    doc = ./README.md;
-  };
+  meta.maintainers = [ ];
 }
