@@ -36,15 +36,16 @@
     "depthfinder-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1777094907,
-        "narHash": "sha256-2R/GGhTA3ZE4O2ldWLsAclkkDp8hZPwLGF6c77QwLyQ=",
-        "ref": "refs/heads/main",
-        "rev": "6065ed29c4d35b04e418c2315d11f4c71a07755f",
-        "revCount": 1,
+        "lastModified": 1778479294,
+        "narHash": "sha256-uJFWN2U/OTey+leR7lYmPaYYmf9+rTsREeO+bMct5nI=",
+        "ref": "refs/tags/V-1.0.2",
+        "rev": "69f18dcadb82869bc749812759cbd0bbae95f460",
+        "revCount": 7,
         "type": "git",
         "url": "https://codeberg.org/ideumi/depthfinder"
       },
       "original": {
+        "ref": "refs/tags/V-1.0.2",
         "type": "git",
         "url": "https://codeberg.org/ideumi/depthfinder"
       }
