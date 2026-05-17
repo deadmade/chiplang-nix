@@ -17,10 +17,20 @@
     };
   };
 
-  outputs = inputs@{ self, nixpkgs, chip-go, boxflinger, depthfinder-src }:
+  outputs =
+    inputs@{
+      self,
+      nixpkgs,
+      chip-go,
+      boxflinger,
+      depthfinder-src,
+    }:
     let
       lib = nixpkgs.lib;
-      linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
+      linuxSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
       forEachLinuxSystem = lib.genAttrs linuxSystems;
 
       versions = {
@@ -29,16 +39,19 @@
         depthfinder = "1.0.3";
       };
 
-      makePackages = pkgs: import ./pkgs {
-        inherit pkgs chip-go versions;
-        boxflingerSrc = boxflinger;
-        depthfinderSrc = depthfinder-src;
-      };
+      makePackages =
+        pkgs:
+        import ./pkgs {
+          inherit pkgs chip-go versions;
+          boxflingerSrc = boxflinger;
+          depthfinderSrc = depthfinder-src;
+        };
     in
     {
       packages = forEachLinuxSystem (system: makePackages nixpkgs.legacyPackages.${system});
 
-      devShells = forEachLinuxSystem (system:
+      devShells = forEachLinuxSystem (
+        system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
           packages = self.packages.${system};
@@ -65,9 +78,11 @@
               export CHIP_DOC_DIR="${packages.chiplang}/share/doc/chiplang"
             '';
           };
-        });
+        }
+      );
 
-      checks = forEachLinuxSystem (system:
+      checks = forEachLinuxSystem (
+        system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
           packages = self.packages.${system};
@@ -75,16 +90,24 @@
         import ./checks {
           inherit pkgs packages;
           module = self.nixosModules.default;
-        });
+        }
+      );
 
       nixosModules.default = import ./module.nix self;
 
-      overlays.default = final: prev:
+      overlays.default =
+        final: prev:
         let
           packages = makePackages final;
         in
         {
-          inherit (packages) chiplang chiplang-nvim chiplang-boxflinger boxflinger depthfinder;
+          inherit (packages)
+            chiplang
+            chiplang-nvim
+            chiplang-boxflinger
+            boxflinger
+            depthfinder
+            ;
         };
     };
 }

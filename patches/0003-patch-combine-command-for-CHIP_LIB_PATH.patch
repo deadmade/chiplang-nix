@@ -1,10 +1,10 @@
 diff --git a/cmd/chippy/combine.go b/cmd/chippy/combine.go
-index 935580c..e8f4a5d 100644
+index aaaaaaa..bbbbbbb 100644
 --- a/cmd/chippy/combine.go
 +++ b/cmd/chippy/combine.go
-@@ -12,11 +12,11 @@ import (
+@@ -11,10 +11,10 @@
+ 	"chip-go/cmd/chippy/safety"
  	"chip-go/internal/constants"
- 	"chip-go/internal/context"
  	"chip-go/internal/roadrunner"
 +	"chip-go/internal/utils"
  	"chip-go/internal/values"
@@ -14,8 +14,7 @@ index 935580c..e8f4a5d 100644
  	"regexp"
  	"sort"
  	"strings"
- )
-@@ -399,7 +399,8 @@ func processDependencies(filename string, paths []string, external map[string]bo
+@@ -406,7 +406,8 @@
  			resolvedPath := resolvePath(depPath, paths)
  
  			if resolvedPath == "" {
@@ -25,7 +24,7 @@ index 935580c..e8f4a5d 100644
  			}
  
  			if !seen[resolvedPath] {
-@@ -417,29 +418,7 @@ func processDependencies(filename string, paths []string, external map[string]bo
+@@ -424,29 +425,7 @@
  }
  
  func resolvePath(filename string, paths []string) string {

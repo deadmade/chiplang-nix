@@ -1,8 +1,8 @@
 diff --git a/internal/builtins/load.go b/internal/builtins/load.go
-index 2e1d695..5f10432 100644
+index aaaaaaa..bbbbbbb 100644
 --- a/internal/builtins/load.go
 +++ b/internal/builtins/load.go
-@@ -11,8 +11,11 @@ import (
+@@ -11,8 +11,11 @@
  	"chip-go/internal/constants"
  	"chip-go/internal/errors"
  	"chip-go/internal/orchestrator"
@@ -13,9 +13,9 @@ index 2e1d695..5f10432 100644
 +	"strings"
  )
  
- func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
-@@ -44,14 +47,27 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
- 		))
+ func loadFunction(args []values.Value, ctx values.Ctx) *values.RuntimeResult {
+@@ -40,14 +43,25 @@
+ 			shared.Errors.InvalidArgTypeWithHint("load", shared.TypeString, "filename")))
  	}
  
 -	content, err := os.ReadFile(filename.Value)
@@ -27,9 +27,7 @@ index 2e1d695..5f10432 100644
 +
 +		return res.Failure(errors.NewRTError(
 +			posStart, posEnd,
-+			fmt.Sprintf("Failed to load file \"%s\": not found in searched paths: [%s]", filename.Value, strings.Join(searchPaths, ", ")),
-+			ctx,
-+		))
++			fmt.Sprintf("Failed to load file \"%s\": not found in searched paths: [%s]", filename.Value, strings.Join(searchPaths, ", "))))
 +	}
 +
 +	content, err := os.ReadFile(resolvedPath)
@@ -39,13 +37,13 @@ index 2e1d695..5f10432 100644
  
  		return res.Failure(errors.NewRTError(
  			posStart, posEnd,
--			"Failed to load file \""+filename.Value+"\": "+err.Error(),
-+			"Failed to read file \""+resolvedPath+"\": "+err.Error(),
- 			ctx,
- 		))
+-			"Failed to load file \""+filename.Value+"\": "+err.Error()))
++			"Failed to read file \""+resolvedPath+"\": "+err.Error()))
  	}
-@@ -68,14 +84,14 @@ func loadFunction(args []values.Value, ctx interface{}) *values.RuntimeResult {
- 		))
+ 
+ 	roadRunner := orchestrator.Get().GetRR2ForContext(ctx.InstanceID)
+@@ -60,14 +74,14 @@
+ 			"RoadRunner2 not available"))
  	}
  
 -	_, err = roadRunner.Run(filename.Value, string(content))
@@ -56,8 +54,8 @@ index 2e1d695..5f10432 100644
  
  		return res.Failure(errors.NewRTError(
  			posStart, posEnd,
--			"Failed to execute file \""+filename.Value+"\":\n"+err.Error(),
-+			"Failed to execute file \""+resolvedPath+"\":\n"+err.Error(),
- 			ctx,
- 		))
+-			"Failed to execute file \""+filename.Value+"\":\n"+err.Error()))
++			"Failed to execute file \""+resolvedPath+"\":\n"+err.Error()))
  	}
+ 
+ 	return res.Success(values.NewString(constants.STR_OK).SetContext(ctx))
