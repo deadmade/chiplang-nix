@@ -12,7 +12,7 @@
       flake = false;
     };
     depthfinder-src = {
-      url = "git+https://codeberg.org/ideumi/depthfinder?ref=refs/tags/V-1.0.2";
+      url = "git+https://codeberg.org/ideumi/depthfinder?ref=refs/tags/V-1.0.3";
       flake = false;
     };
   };
@@ -26,7 +26,7 @@
       versions = {
         chiplang = "1.0.17";
         boxflinger = "1.0.7";
-        depthfinder = "1.0.2";
+        depthfinder = "1.0.3";
       };
 
       makePackages = pkgs: import ./pkgs {
