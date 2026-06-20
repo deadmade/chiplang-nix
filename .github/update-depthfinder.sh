@@ -19,12 +19,12 @@ for arg in "$@"; do
 done
 
 # Fetch latest release from Codeberg (Gitea API)
-LATEST_RESPONSE=$(curl -sf "https://codeberg.org/api/v1/repos/${CODEBERG_OWNER}/${CODEBERG_REPO}/releases/latest" 2>/dev/null || echo "{}")
+LATEST_RESPONSE=$(curl -sfL "https://codeberg.org/api/v1/repos/${CODEBERG_OWNER}/${CODEBERG_REPO}/releases/latest" 2>/dev/null || echo "{}")
 LATEST_TAG=$(echo "$LATEST_RESPONSE" | jq -r '.tag_name // empty')
 
 # Fall back to tags if no releases exist
 if [ -z "$LATEST_TAG" ]; then
-  TAGS_RESPONSE=$(curl -sf "https://codeberg.org/api/v1/repos/${CODEBERG_OWNER}/${CODEBERG_REPO}/tags?limit=1" 2>/dev/null || echo "[]")
+  TAGS_RESPONSE=$(curl -sfL "https://codeberg.org/api/v1/repos/${CODEBERG_OWNER}/${CODEBERG_REPO}/tags?limit=1" 2>/dev/null || echo "[]")
   LATEST_TAG=$(echo "$TAGS_RESPONSE" | jq -r '.[0].name // empty')
 fi
 

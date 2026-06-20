@@ -1,6 +1,6 @@
 # chiplang-nix {#chiplang-nix}
 
-Nix flake packaging for [ChipLang](https://codeberg.org/ideumi/chip-go), the `chippy` interpreter, its standard library assets, and related tooling.
+Nix flake packaging for [ChipLang](https://codeberg.org/ideumi/chippy), the `chippy` interpreter, its standard library assets, and related tooling.
 
 ## Packages {#chiplang-nix-packages}
 
