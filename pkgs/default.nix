@@ -41,7 +41,7 @@ rec {
         It focuses on a small, modular, understandable runtime for scripting and
         tooling that would be awkward to build and maintain in shell.
       '';
-      homepage = "https://codeberg.org/ideumi/chip-go";
+      homepage = "https://codeberg.org/ideumi/chippy";
       license = lib.licenses.bsd2;
       mainProgram = "chippy";
       platforms = lib.platforms.linux;
@@ -55,8 +55,8 @@ rec {
 
     postInstall = ''
       mkdir -p $out/syntax $out/ftdetect
-      cp $src/ide/vim/syntax/chiplang.vim $out/syntax/
-      cp $src/ide/vim/ftdetect/chiplang.vim $out/ftdetect/
+      cp $src/ide/vim/syntax/chippy.vim $out/syntax/
+      cp $src/ide/vim/ftdetect/chippy.vim $out/ftdetect/
 
       find $out -mindepth 1 -maxdepth 1 \
         ! -name 'syntax' \
@@ -66,7 +66,7 @@ rec {
 
     meta = {
       description = "Vim and Neovim syntax highlighting for ChipLang";
-      homepage = "https://codeberg.org/ideumi/chip-go";
+      homepage = "https://codeberg.org/ideumi/chippy";
       license = lib.licenses.bsd2;
       platforms = lib.platforms.all;
     };

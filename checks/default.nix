@@ -36,8 +36,8 @@ in
   '';
 
   chiplang-nvim-layout = pkgs.runCommand "chiplang-nvim-layout" {} ''
-    test -f "${packages.chiplang-nvim}/syntax/chiplang.vim"
-    test -f "${packages.chiplang-nvim}/ftdetect/chiplang.vim"
+    test -f "${packages.chiplang-nvim}/syntax/chippy.vim"
+    test -f "${packages.chiplang-nvim}/ftdetect/chippy.vim"
     touch "$out"
   '';
 
