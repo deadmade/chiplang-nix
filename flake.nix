@@ -8,7 +8,7 @@
       flake = false;
     };
     boxflinger = {
-      url = "git+https://codeberg.org/ideumi/boxflinger?ref=refs/tags/V-1.0.10";
+      url = "git+https://codeberg.org/ideumi/boxflinger?ref=refs/tags/V-1.0.11";
       flake = false;
     };
     depthfinder-src = {
@@ -35,7 +35,7 @@
 
       versions = {
         chiplang = "1.0.21";
-        boxflinger = "1.0.10";
+        boxflinger = "1.0.11";
         depthfinder = "1.0.6";
       };
 
