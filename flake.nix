@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     chip-go = {
-      url = "git+https://codeberg.org/ideumi/chippy?ref=refs/tags/V-1.0.21";
+      url = "git+https://codeberg.org/ideumi/chippy?ref=refs/tags/V-1.0.22";
       flake = false;
     };
     boxflinger = {
@@ -34,7 +34,7 @@
       forEachLinuxSystem = lib.genAttrs linuxSystems;
 
       versions = {
-        chiplang = "1.0.21";
+        chiplang = "1.0.22";
         boxflinger = "1.0.11";
         depthfinder = "1.0.7";
       };
