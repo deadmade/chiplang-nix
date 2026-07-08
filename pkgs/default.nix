@@ -152,6 +152,16 @@ rec {
 
     nativeBuildInputs = [ chiplang pkgs.makeWrapper ];
 
+    # dfn-mounter shells out to lsblk and udisksctl via hardcoded /usr/bin paths.
+    # Point them at the Nix store so it works outside of FHS distros. (udisksctl
+    # still needs the udisks2 D-Bus daemon running on the host, e.g. via
+    # services.udisks2.enable = true.)
+    postPatch = ''
+      substituteInPlace src/constants.chh \
+        --replace-fail '/usr/bin/lsblk' '${lib.getExe' pkgs.util-linux "lsblk"}' \
+        --replace-fail '/usr/bin/udisksctl' '${lib.getExe' pkgs.udisks2 "udisksctl"}'
+    '';
+
     buildPhase = ''
       export CHIP_LIB_PATH="${chiplang}/lib/chiplang"
       export CHIP_DOC_DIR="${chiplang}/share/doc/chiplang"
