@@ -1,4 +1,4 @@
-{ pkgs, chip-go, boxflingerSrc, depthfinderSrc, versions }:
+{ pkgs, chip-go, boxflingerSrc, depthfinderSrc, dfnMounterSrc, versions }:
 
 let
   lib = pkgs.lib;
@@ -140,6 +140,44 @@ rec {
       homepage = "https://codeberg.org/ideumi/depthfinder";
       license = lib.licenses.bsd2;
       mainProgram = "dfn";
+      platforms = lib.platforms.linux;
+    };
+  };
+
+  dfn-mounter = pkgs.stdenv.mkDerivation {
+    pname = "dfn-mounter";
+    version = versions.dfn-mounter;
+
+    src = dfnMounterSrc;
+
+    nativeBuildInputs = [ chiplang pkgs.makeWrapper ];
+
+    buildPhase = ''
+      export CHIP_LIB_PATH="${chiplang}/lib/chiplang"
+      export CHIP_DOC_DIR="${chiplang}/share/doc/chiplang"
+
+      mkdir -p out
+      chippy combine
+    '';
+
+    installPhase = ''
+      mkdir -p $out/bin $out/libexec/dfn-mounter
+      cp out/dfn-mounter $out/libexec/dfn-mounter/dfn-mounter.chp
+      makeWrapper ${chiplang}/bin/chippy $out/bin/dfn-mounter \
+        --add-flags "$out/libexec/dfn-mounter/dfn-mounter.chp"
+    '';
+
+    meta = {
+      description = "Boxflinger-based TUI disk mounter for Linux";
+      longDescription = ''
+        dfn-mounter is a fast, minimalist terminal disk mounter for Linux, built
+        with Boxflinger and designed for parallel use with depthfinder. Provides a
+        device/partition overview, mount/unmount, LUKS unlocking, LVM support, and
+        device eject/power-off.
+      '';
+      homepage = "https://codeberg.org/ideumi/dfn-mounter";
+      license = lib.licenses.bsd2;
+      mainProgram = "dfn-mounter";
       platforms = lib.platforms.linux;
     };
   };

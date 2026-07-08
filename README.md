@@ -11,6 +11,7 @@ This flake exports these package attributes on supported Linux systems:
 - `boxflinger` - compatibility alias for `chiplang-boxflinger`
 - `chiplang-nvim` - Vim/Neovim runtime files for ChipLang syntax highlighting
 - `depthfinder` - the `dfn` terminal file manager
+- `dfn-mounter` - the `dfn-mounter` Boxflinger-based TUI disk mounter
 - `default` - alias for `chiplang`
 
 ## Quick Start {#chiplang-nix-quick-start}
@@ -98,6 +99,7 @@ The overlay exports:
 - `boxflinger`
 - `chiplang-nvim`
 - `depthfinder`
+- `dfn-mounter`
 
 ## Editor Support {#chiplang-nix-editor-support}
 
@@ -116,4 +118,5 @@ Use it from your preferred Vim or Neovim Nix configuration by adding the package
 - `chiplang-boxflinger` library installation
 - `chiplang-nvim` runtime file layout
 - `depthfinder` binary layout
+- `dfn-mounter` binary layout
 - `nixosModules.default` environment variable wiring

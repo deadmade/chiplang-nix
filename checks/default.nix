@@ -51,6 +51,12 @@ in
     touch "$out"
   '';
 
+  dfn-mounter-layout = pkgs.runCommand "dfn-mounter-layout" {} ''
+    test -f "${packages.dfn-mounter}/bin/dfn-mounter"
+    test -f "${packages.dfn-mounter}/libexec/dfn-mounter/dfn-mounter.chp"
+    touch "$out"
+  '';
+
   nixos-module-eval = pkgs.runCommand "nixos-module-eval" {
     inherit systemPackagePaths sessionVariables;
   } ''

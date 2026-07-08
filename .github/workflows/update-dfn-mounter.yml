@@ -1,4 +1,4 @@
-name: Update Depthfinder
+name: Update dfn-mounter
 
 on:
   workflow_dispatch:
@@ -6,8 +6,8 @@ on:
     - cron: "0 * * * *"
 
 jobs:
-  update-depthfinder:
-    name: Update Depthfinder
+  update-dfn-mounter:
+    name: Update dfn-mounter
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -20,7 +20,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          .github/update-depthfinder.sh --ci --only-check
+          .github/update-dfn-mounter.sh --ci --only-check
 
       - name: Install Nix
         if: steps.check.outputs.should_update == 'true'
@@ -38,7 +38,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          .github/update-depthfinder.sh --ci
+          .github/update-dfn-mounter.sh --ci
 
       - name: Build packages
         if: steps.check.outputs.should_update == 'true'

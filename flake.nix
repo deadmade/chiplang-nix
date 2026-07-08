@@ -15,6 +15,10 @@
       url = "git+https://codeberg.org/ideumi/depthfinder?ref=refs/tags/V-1.0.10";
       flake = false;
     };
+    dfn-mounter-src = {
+      url = "git+https://codeberg.org/ideumi/dfn-mounter?ref=refs/tags/V-1.0.1";
+      flake = false;
+    };
   };
 
   outputs =
@@ -24,6 +28,7 @@
       chip-go,
       boxflinger,
       depthfinder-src,
+      dfn-mounter-src,
     }:
     let
       lib = nixpkgs.lib;
@@ -37,6 +42,7 @@
         chiplang = "1.0.24";
         boxflinger = "1.0.11";
         depthfinder = "1.0.10";
+        dfn-mounter = "1.0.1";
       };
 
       makePackages =
@@ -45,6 +51,7 @@
           inherit pkgs chip-go versions;
           boxflingerSrc = boxflinger;
           depthfinderSrc = depthfinder-src;
+          dfnMounterSrc = dfn-mounter-src;
         };
     in
     {
@@ -66,6 +73,7 @@
               packages.chiplang
               packages.chiplang-boxflinger
               packages.depthfinder
+              packages.dfn-mounter
             ];
 
             shellHook = ''
@@ -107,6 +115,7 @@
             chiplang-boxflinger
             boxflinger
             depthfinder
+            dfn-mounter
             ;
         };
     };
