@@ -39,10 +39,34 @@ in
         '';
       };
     };
+
+    dfn-mounter = {
+      enable = lib.mkEnableOption "the dfn-mounter TUI disk mounter";
+
+      package = lib.mkOption {
+        type = lib.types.package;
+        default = flakePackages.dfn-mounter;
+        defaultText = lib.literalExpression "chiplang-nix.packages.\${pkgs.system}.dfn-mounter";
+        description = ''
+          dfn-mounter package to install. Requires the udisks2 daemon
+          (`services.udisks2.enable`) and lsblk at runtime.
+        '';
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [ cfg.package ];
+    environment.systemPackages =
+      [ cfg.package ]
+      ++ lib.optional cfg.dfn-mounter.enable cfg.dfn-mounter.package;
+
+    # dfn-mounter shells out to udisksctl, which needs the udisks2 D-Bus daemon
+    # running on the host. Warn at nixos-rebuild time if it is not enabled.
+    warnings = lib.optional (cfg.dfn-mounter.enable && !config.services.udisks2.enable) ''
+      programs.chiplang.dfn-mounter is enabled but services.udisks2.enable is not set.
+      dfn-mounter needs the udisks2 daemon (and lsblk) at runtime to mount, unmount,
+      unlock, and power off devices. Set services.udisks2.enable = true;
+    '';
 
     environment.sessionVariables =
       let
