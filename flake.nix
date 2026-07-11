@@ -12,7 +12,7 @@
       flake = false;
     };
     depthfinder-src = {
-      url = "git+https://codeberg.org/ideumi/depthfinder?ref=refs/tags/V-1.0.10";
+      url = "git+https://codeberg.org/ideumi/depthfinder?ref=refs/tags/V-1.0.11";
       flake = false;
     };
     dfn-mounter-src = {
@@ -41,7 +41,7 @@
       versions = {
         chiplang = "1.0.24";
         boxflinger = "1.0.11";
-        depthfinder = "1.0.10";
+        depthfinder = "1.0.11";
         dfn-mounter = "1.0.2";
       };
 
