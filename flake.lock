@@ -17,7 +17,7 @@
         "url": "https://codeberg.org/ideumi/boxflinger"
       }
     },
-    "chip-go": {
+    "chippy-src": {
       "flake": false,
       "locked": {
         "lastModified": 1783255925,
@@ -87,7 +87,7 @@
     "root": {
       "inputs": {
         "boxflinger": "boxflinger",
-        "chip-go": "chip-go",
+        "chippy-src": "chippy-src",
         "depthfinder-src": "depthfinder-src",
         "dfn-mounter-src": "dfn-mounter-src",
         "nixpkgs": "nixpkgs"

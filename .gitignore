@@ -13,7 +13,7 @@ result-*
 # Nix-specific
 .direnv/
 
-# ChipLang compiled binaries
+# Chippy compiled binaries
 bftest
 myprogram
 
@@ -24,6 +24,6 @@ myprogram
 *.dylib
 *.tmp
 
-# ChipLang temporary/cache files
+# Chippy temporary/cache files
 *.chp.tmp
 *.chh.tmp

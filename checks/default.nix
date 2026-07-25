@@ -3,46 +3,65 @@
 let
   lib = pkgs.lib;
 
-  moduleEval = import "${pkgs.path}/nixos/lib/eval-config.nix" {
-    system = pkgs.stdenv.hostPlatform.system;
-    modules = [
-      module
-      {
-        programs.chiplang.enable = true;
-        programs.chiplang.boxflinger.enable = true;
-        system.stateVersion = "26.05";
-      }
-    ];
+  evalModule =
+    settings:
+    import "${pkgs.path}/nixos/lib/eval-config.nix" {
+      system = pkgs.stdenv.hostPlatform.system;
+      modules = [
+        module
+        (settings // { system.stateVersion = "26.05"; })
+      ];
+    };
+
+  moduleEval = evalModule {
+    programs.chippy.enable = true;
+    programs.chippy.boxflinger.enable = true;
   };
 
-  expectedLibPath = "${packages.chiplang}/lib/chiplang:${packages.chiplang-boxflinger}/lib/chiplang";
-  expectedDocPath = "${packages.chiplang}/share/doc/chiplang";
+  # The pre-rename option paths must keep producing the same wiring.
+  legacyModuleEval = evalModule {
+    programs.chiplang.enable = true;
+    programs.chiplang.boxflinger.enable = true;
+  };
+
+  expectedLibPath = "${packages.chippy}/lib/chippy:${packages.chippy-boxflinger}/lib/chippy";
+  expectedDocPath = "${packages.chippy}/share/doc/chippy";
   systemPackagePaths = builtins.toJSON (map (pkg: pkg.outPath) moduleEval.config.environment.systemPackages);
   sessionVariables = builtins.toJSON moduleEval.config.environment.sessionVariables;
+  legacySessionVariables = builtins.toJSON legacyModuleEval.config.environment.sessionVariables;
 in
 {
-  chiplang-smoke = pkgs.runCommand "chiplang-smoke" {
-    nativeBuildInputs = [ packages.chiplang ];
+  chippy-smoke = pkgs.runCommand "chippy-smoke" {
+    nativeBuildInputs = [ packages.chippy ];
   } ''
     export HOME="$TMPDIR"
-    export CHIP_LIB_PATH="${packages.chiplang}/lib/chiplang"
-    export CHIP_DOC_DIR="${packages.chiplang}/share/doc/chiplang"
+    export CHIP_LIB_PATH="${packages.chippy}/lib/chippy"
+    export CHIP_DOC_DIR="${packages.chippy}/share/doc/chippy"
 
-    ${packages.chiplang}/bin/chippy ${../tests/chippy/main.chp} > output.txt
+    ${packages.chippy}/bin/chippy ${../tests/chippy/main.chp} > output.txt
 
-    grep -F "ChipLang Nix Package Test" output.txt
+    grep -F "Chippy Nix Package Test" output.txt
     grep -F "=========================" output.txt
     touch "$out"
   '';
 
-  chiplang-nvim-layout = pkgs.runCommand "chiplang-nvim-layout" {} ''
-    test -f "${packages.chiplang-nvim}/syntax/chippy.vim"
-    test -f "${packages.chiplang-nvim}/ftdetect/chippy.vim"
+  chippy-nvim-layout = pkgs.runCommand "chippy-nvim-layout" {} ''
+    test -f "${packages.chippy-nvim}/syntax/chippy.vim"
+    test -f "${packages.chippy-nvim}/ftdetect/chippy.vim"
     touch "$out"
   '';
 
-  chiplang-boxflinger-layout = pkgs.runCommand "chiplang-boxflinger-layout" {} ''
-    test -f "${packages.chiplang-boxflinger}/lib/chiplang/libboxflinger.chh"
+  chippy-boxflinger-layout = pkgs.runCommand "chippy-boxflinger-layout" {} ''
+    test -f "${packages.chippy-boxflinger}/lib/chippy/libboxflinger.chh"
+    touch "$out"
+  '';
+
+  # The compatibility aliases must resolve to the renamed packages.
+  chippy-legacy-aliases = pkgs.runCommand "chippy-legacy-aliases" {} ''
+    test "${packages.chiplang}" = "${packages.chippy}"
+    test "${packages.chiplang-nvim}" = "${packages.chippy-nvim}"
+    test "${packages.chiplang-boxflinger}" = "${packages.chippy-boxflinger}"
+    test "${packages.boxflinger}" = "${packages.chippy-boxflinger}"
     touch "$out"
   '';
 
@@ -60,9 +79,16 @@ in
   nixos-module-eval = pkgs.runCommand "nixos-module-eval" {
     inherit systemPackagePaths sessionVariables;
   } ''
-    printf '%s' "$systemPackagePaths" | grep -F '"${packages.chiplang}"'
+    printf '%s' "$systemPackagePaths" | grep -F '"${packages.chippy}"'
     printf '%s' "$sessionVariables" | grep -F '"CHIP_DOC_DIR":"${expectedDocPath}"'
     printf '%s' "$sessionVariables" | grep -F '"CHIP_LIB_PATH":"${expectedLibPath}"'
+    touch "$out"
+  '';
+
+  nixos-module-renamed-options = pkgs.runCommand "nixos-module-renamed-options" {
+    inherit sessionVariables legacySessionVariables;
+  } ''
+    test "$legacySessionVariables" = "$sessionVariables"
     touch "$out"
   '';
 }

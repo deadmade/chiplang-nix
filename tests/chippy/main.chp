@@ -1,6 +1,6 @@
 #!/usr/bin/env chippy
 #
-# ChipLang Nix Package Test Script
+# Chippy Nix Package Test Script
 #
 # This script demonstrates the CHIP_LIB_PATH functionality
 # which allows libraries to be loaded from system paths.
@@ -8,7 +8,7 @@
 # Now we can load system libraries directly!
 load("libprint.chh");
 
-Println("ChipLang Nix Package Test");
+Println("Chippy Nix Package Test");
 Println("=========================");
 Println("");
 

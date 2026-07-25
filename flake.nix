@@ -1,9 +1,9 @@
 {
-  description = "ChipLang - A simple, modular scripting language";
+  description = "Chippy - A simple, modular scripting language";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    chip-go = {
+    chippy-src = {
       url = "git+https://codeberg.org/ideumi/chippy?ref=refs/tags/V-1.0.24";
       flake = false;
     };
@@ -25,7 +25,7 @@
     inputs@{
       self,
       nixpkgs,
-      chip-go,
+      chippy-src,
       boxflinger,
       depthfinder-src,
       dfn-mounter-src,
@@ -39,7 +39,7 @@
       forEachLinuxSystem = lib.genAttrs linuxSystems;
 
       versions = {
-        chiplang = "1.0.24";
+        chippy = "1.0.24";
         boxflinger = "1.0.11";
         depthfinder = "1.0.11";
         dfn-mounter = "1.0.2";
@@ -48,7 +48,8 @@
       makePackages =
         pkgs:
         import ./pkgs {
-          inherit pkgs chip-go versions;
+          inherit pkgs versions;
+          chippySrc = chippy-src;
           boxflingerSrc = boxflinger;
           depthfinderSrc = depthfinder-src;
           dfnMounterSrc = dfn-mounter-src;
@@ -65,25 +66,25 @@
         in
         {
           default = pkgs.mkShell {
-            name = "chiplang-dev";
+            name = "chippy-dev";
 
             buildInputs = with pkgs; [
               go
               gopls
-              packages.chiplang
-              packages.chiplang-boxflinger
+              packages.chippy
+              packages.chippy-boxflinger
               packages.depthfinder
               packages.dfn-mounter
             ];
 
             shellHook = ''
-              echo "ChipLang development environment v${versions.chiplang}"
-              echo "  ChipLang: ${packages.chiplang}/bin/chippy"
-              echo "  Libraries: ${packages.chiplang}/lib/chiplang"
-              echo "  Documentation: ${packages.chiplang}/share/doc/chiplang"
+              echo "Chippy development environment v${versions.chippy}"
+              echo "  Chippy: ${packages.chippy}/bin/chippy"
+              echo "  Libraries: ${packages.chippy}/lib/chippy"
+              echo "  Documentation: ${packages.chippy}/share/doc/chippy"
 
-              export CHIP_LIB_PATH="${packages.chiplang}/lib/chiplang:${packages.chiplang-boxflinger}/lib/chiplang"
-              export CHIP_DOC_DIR="${packages.chiplang}/share/doc/chiplang"
+              export CHIP_LIB_PATH="${packages.chippy}/lib/chippy:${packages.chippy-boxflinger}/lib/chippy"
+              export CHIP_DOC_DIR="${packages.chippy}/share/doc/chippy"
             '';
           };
         }
@@ -110,6 +111,9 @@
         in
         {
           inherit (packages)
+            chippy
+            chippy-nvim
+            chippy-boxflinger
             chiplang
             chiplang-nvim
             chiplang-boxflinger

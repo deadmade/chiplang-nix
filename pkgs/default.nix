@@ -1,14 +1,14 @@
-{ pkgs, chip-go, boxflingerSrc, depthfinderSrc, dfnMounterSrc, versions }:
+{ pkgs, chippySrc, boxflingerSrc, depthfinderSrc, dfnMounterSrc, versions }:
 
 let
   lib = pkgs.lib;
 in
 rec {
-  chiplang = pkgs.buildGoModule {
-    pname = "chiplang";
-    version = versions.chiplang;
+  chippy = pkgs.buildGoModule {
+    pname = "chippy";
+    version = versions.chippy;
 
-    src = chip-go;
+    src = chippySrc;
 
     patches = [
       ../patches/0001-add-path-resolver-utility.patch
@@ -27,17 +27,17 @@ rec {
     subPackages = [ "cmd/chippy" ];
 
     postInstall = ''
-      mkdir -p $out/lib/chiplang
-      cp -r $src/lib/*.chh $out/lib/chiplang/
+      mkdir -p $out/lib/chippy
+      cp -r $src/lib/*.chh $out/lib/chippy/
 
-      mkdir -p $out/share/doc/chiplang
-      cp -r doc/*.chpdoc $out/share/doc/chiplang/
+      mkdir -p $out/share/doc/chippy
+      cp -r doc/*.chpdoc $out/share/doc/chippy/
     '';
 
     meta = {
-      description = "ChipLang (Chipmunk language) interpreter with standard library and docs";
+      description = "Chippy (Chipmunk language) interpreter with standard library and docs";
       longDescription = ''
-        ChipLang is an interpreted scripting/programming language written in Go.
+        Chippy is an interpreted scripting/programming language written in Go.
         It focuses on a small, modular, understandable runtime for scripting and
         tooling that would be awkward to build and maintain in shell.
       '';
@@ -48,10 +48,10 @@ rec {
     };
   };
 
-  chiplang-nvim = pkgs.vimUtils.buildVimPlugin {
-    pname = "chiplang-nvim";
-    version = versions.chiplang;
-    src = chip-go;
+  chippy-nvim = pkgs.vimUtils.buildVimPlugin {
+    pname = "chippy-nvim";
+    version = versions.chippy;
+    src = chippySrc;
 
     postInstall = ''
       mkdir -p $out/syntax $out/ftdetect
@@ -65,38 +65,38 @@ rec {
     '';
 
     meta = {
-      description = "Vim and Neovim syntax highlighting for ChipLang";
+      description = "Vim and Neovim syntax highlighting for Chippy";
       homepage = "https://codeberg.org/ideumi/chippy";
       license = lib.licenses.bsd2;
       platforms = lib.platforms.all;
     };
   };
 
-  chiplang-boxflinger = pkgs.stdenv.mkDerivation {
-    pname = "chiplang-boxflinger";
+  chippy-boxflinger = pkgs.stdenv.mkDerivation {
+    pname = "chippy-boxflinger";
     version = versions.boxflinger;
 
     src = boxflingerSrc;
 
-    nativeBuildInputs = [ chiplang ];
+    nativeBuildInputs = [ chippy ];
 
     buildPhase = ''
-      export CHIP_LIB_PATH="${chiplang}/lib/chiplang"
-      export CHIP_DOC_DIR="${chiplang}/share/doc/chiplang"
+      export CHIP_LIB_PATH="${chippy}/lib/chippy"
+      export CHIP_DOC_DIR="${chippy}/share/doc/chippy"
 
       mkdir -p out
       chippy combine
     '';
 
     installPhase = ''
-      mkdir -p $out/lib/chiplang
-      cp out/libboxflinger.chh $out/lib/chiplang/
+      mkdir -p $out/lib/chippy
+      cp out/libboxflinger.chh $out/lib/chippy/
     '';
 
     meta = {
-      description = "Boxflinger terminal UI library for ChipLang";
+      description = "Boxflinger terminal UI library for Chippy";
       longDescription = ''
-        Boxflinger provides terminal UI widgets and drawing primitives for ChipLang,
+        Boxflinger provides terminal UI widgets and drawing primitives for Chippy,
         including text input, menus, lists, radio buttons, checkboxes, sliders,
         progress bars, and layout management.
       '';
@@ -112,11 +112,11 @@ rec {
 
     src = depthfinderSrc;
 
-    nativeBuildInputs = [ chiplang pkgs.makeWrapper ];
+    nativeBuildInputs = [ chippy pkgs.makeWrapper ];
 
     buildPhase = ''
-      export CHIP_LIB_PATH="${chiplang}/lib/chiplang"
-      export CHIP_DOC_DIR="${chiplang}/share/doc/chiplang"
+      export CHIP_LIB_PATH="${chippy}/lib/chippy"
+      export CHIP_DOC_DIR="${chippy}/share/doc/chippy"
 
       mkdir -p out
       chippy combine
@@ -125,12 +125,12 @@ rec {
     installPhase = ''
       mkdir -p $out/bin $out/libexec/depthfinder
       cp out/dfn $out/libexec/depthfinder/dfn.chp
-      makeWrapper ${chiplang}/bin/chippy $out/bin/dfn \
+      makeWrapper ${chippy}/bin/chippy $out/bin/dfn \
         --add-flags "$out/libexec/depthfinder/dfn.chp"
     '';
 
     meta = {
-      description = "Terminal-based file manager written in ChipLang";
+      description = "Terminal-based file manager written in Chippy";
       longDescription = ''
         depthfinder (dfn) is a two-panel terminal file manager with zero-config
         design. Supports copy, cut, paste, delete, rename, bulk rename, multi-select,
@@ -150,7 +150,7 @@ rec {
 
     src = dfnMounterSrc;
 
-    nativeBuildInputs = [ chiplang pkgs.makeWrapper ];
+    nativeBuildInputs = [ chippy pkgs.makeWrapper ];
 
     # dfn-mounter shells out to lsblk and udisksctl via hardcoded /usr/bin paths.
     # Point them at the Nix store so it works outside of FHS distros. (udisksctl
@@ -163,8 +163,8 @@ rec {
     '';
 
     buildPhase = ''
-      export CHIP_LIB_PATH="${chiplang}/lib/chiplang"
-      export CHIP_DOC_DIR="${chiplang}/share/doc/chiplang"
+      export CHIP_LIB_PATH="${chippy}/lib/chippy"
+      export CHIP_DOC_DIR="${chippy}/share/doc/chippy"
 
       mkdir -p out
       chippy combine
@@ -173,7 +173,7 @@ rec {
     installPhase = ''
       mkdir -p $out/bin $out/libexec/dfn-mounter
       cp out/dfn-mounter $out/libexec/dfn-mounter/dfn-mounter.chp
-      makeWrapper ${chiplang}/bin/chippy $out/bin/dfn-mounter \
+      makeWrapper ${chippy}/bin/chippy $out/bin/dfn-mounter \
         --add-flags "$out/libexec/dfn-mounter/dfn-mounter.chp"
     '';
 
@@ -192,6 +192,11 @@ rec {
     };
   };
 
-  boxflinger = chiplang-boxflinger;
-  default = chiplang;
+  # Compatibility aliases for the pre-rename attribute names.
+  chiplang = chippy;
+  chiplang-nvim = chippy-nvim;
+  chiplang-boxflinger = chippy-boxflinger;
+  boxflinger = chippy-boxflinger;
+
+  default = chippy;
 }

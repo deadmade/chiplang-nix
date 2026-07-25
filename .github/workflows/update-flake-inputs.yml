@@ -22,10 +22,10 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - name: ChipLang
+          - name: Chippy
             repo: chippy
-            input: chip-go
-            key: chiplang
+            input: chippy-src
+            key: chippy
           - name: Boxflinger
             repo: boxflinger
             input: boxflinger
