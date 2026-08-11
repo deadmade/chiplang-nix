@@ -1,10 +1,10 @@
 diff --git a/internal/builtins/load.go b/internal/builtins/load.go
-index aaaaaaa..bbbbbbb 100644
+index 6a58e1b..a7c162c 100644
 --- a/internal/builtins/load.go
 +++ b/internal/builtins/load.go
-@@ -11,8 +11,11 @@
+@@ -10,8 +10,11 @@ import (
+ 	"chip-go/internal/builtins/shared"
  	"chip-go/internal/constants"
- 	"chip-go/internal/errors"
  	"chip-go/internal/orchestrator"
 +	"chip-go/internal/utils"
  	"chip-go/internal/values"
@@ -13,49 +13,39 @@ index aaaaaaa..bbbbbbb 100644
 +	"strings"
  )
  
- func loadFunction(args []values.Value, ctx values.Ctx) *values.RuntimeResult {
-@@ -40,14 +43,25 @@
- 			shared.Errors.InvalidArgTypeWithHint("load", shared.TypeString, "filename")))
+ func loadFunction(args []values.Value, ctx values.Ctx) values.RuntimeResult {
+@@ -27,10 +30,19 @@ func loadFunction(args []values.Value, ctx values.Ctx) values.RuntimeResult {
+ 		return res.FailAt(1, shared.Errors.InvalidArgTypeWithHint("load", shared.TypeString, "filename"))
  	}
  
 -	content, err := os.ReadFile(filename.Value)
 +	resolvedPath := utils.ResolveLibraryPath(filename.Value, nil)
 +
 +	if resolvedPath == "" {
-+		posStart, posEnd := args[0].GetPos()
 +		searchPaths := utils.GetAllSearchPaths(nil)
 +
-+		return res.Failure(errors.NewRTError(
-+			posStart, posEnd,
-+			fmt.Sprintf("Failed to load file \"%s\": not found in searched paths: [%s]", filename.Value, strings.Join(searchPaths, ", "))))
++		return res.FailAt(1, fmt.Sprintf("Failed to load file \"%s\": not found in searched paths: [%s]",
++			filename.Value, strings.Join(searchPaths, ", ")))
 +	}
 +
 +	content, err := os.ReadFile(resolvedPath)
  
  	if err != nil {
- 		posStart, posEnd := args[0].GetPos()
- 
- 		return res.Failure(errors.NewRTError(
- 			posStart, posEnd,
--			"Failed to load file \""+filename.Value+"\": "+err.Error()))
-+			"Failed to read file \""+resolvedPath+"\": "+err.Error()))
+-		return res.FailAt(1, "Failed to load file \""+filename.Value+"\": "+err.Error())
++		return res.FailAt(1, "Failed to read file \""+resolvedPath+"\": "+err.Error())
  	}
  
- 	roadRunner := orchestrator.Get().GetRR2ForContext(ctx.InstanceID)
-@@ -60,14 +74,14 @@
- 			"RoadRunner2 not available"))
+ 	mod := orchestrator.Get().GetModenaForContext(ctx.InstanceID)
+@@ -39,10 +51,10 @@ func loadFunction(args []values.Value, ctx values.Ctx) values.RuntimeResult {
+ 		return res.FailAt(1, "Modena not available")
  	}
  
--	_, err = roadRunner.Run(filename.Value, string(content))
-+	_, err = roadRunner.Run(resolvedPath, string(content))
+-	_, err = mod.Run(filename.Value, string(content))
++	_, err = mod.Run(resolvedPath, string(content))
  
  	if err != nil {
- 		posStart, posEnd := args[0].GetPos()
- 
- 		return res.Failure(errors.NewRTError(
- 			posStart, posEnd,
--			"Failed to execute file \""+filename.Value+"\":\n"+err.Error()))
-+			"Failed to execute file \""+resolvedPath+"\":\n"+err.Error()))
+-		return res.FailAt(1, "Failed to execute file \""+filename.Value+"\":\n"+err.Error())
++		return res.FailAt(1, "Failed to execute file \""+resolvedPath+"\":\n"+err.Error())
  	}
  
- 	return res.Success(values.NewString(constants.STR_OK).SetContext(ctx))
+ 	return res.Success(values.NewString(constants.STR_OK))

@@ -92,6 +92,10 @@ fi
 
 echo "Update available: ${CURRENT_VERSION} -> ${LATEST_VERSION}"
 
+# Exported so a later step can name the version in a failure report.
+set_output current_version "$CURRENT_VERSION"
+set_output latest_version "$LATEST_VERSION"
+
 if $ONLY_CHECK; then
   set_output should_update true
   exit 0
