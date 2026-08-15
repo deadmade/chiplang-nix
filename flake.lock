@@ -20,16 +20,16 @@
     "chippy-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1785569110,
-        "narHash": "sha256-nncQe7y3j7ODI1smzXZVKXOiDRHK0RJibPbK+L5dvgw=",
-        "ref": "refs/tags/V-1.1.0",
-        "rev": "f561cdf52733d4d8bbc1c7eb2783ed9dae7d52fa",
-        "revCount": 303,
+        "lastModified": 1786717411,
+        "narHash": "sha256-6WCJqYeNtFU3/R6tUeFGE9apsiB1UYbDfvdW6qrV1iI=",
+        "ref": "refs/tags/V-1.1.1",
+        "rev": "ee8185921dad1587070734fecd5c6117cd4e0066",
+        "revCount": 327,
         "type": "git",
         "url": "https://codeberg.org/ideumi/chippy"
       },
       "original": {
-        "ref": "refs/tags/V-1.1.0",
+        "ref": "refs/tags/V-1.1.1",
         "type": "git",
         "url": "https://codeberg.org/ideumi/chippy"
       }
