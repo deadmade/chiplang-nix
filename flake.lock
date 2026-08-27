@@ -54,16 +54,16 @@
     "dfn-mounter-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1786718761,
-        "narHash": "sha256-HeEkiFCo9bPKaVgSXmDm6ZRY4thtRNz0b/mMIo2Mayk=",
-        "ref": "refs/tags/V-1.0.4",
-        "rev": "dbea13345b8dc1a59fd7d69b82684771dccb150e",
-        "revCount": 23,
+        "lastModified": 1787671671,
+        "narHash": "sha256-NjfG/fF/0w31BfAu5iU0wptiz+7votPQGWpkmXcEeiM=",
+        "ref": "refs/tags/V-1.0.5",
+        "rev": "24d0fa5a86a15833857e9ee9d21a8a29f4a99b80",
+        "revCount": 27,
         "type": "git",
         "url": "https://codeberg.org/ideumi/dfn-mounter"
       },
       "original": {
-        "ref": "refs/tags/V-1.0.4",
+        "ref": "refs/tags/V-1.0.5",
         "type": "git",
         "url": "https://codeberg.org/ideumi/dfn-mounter"
       }
