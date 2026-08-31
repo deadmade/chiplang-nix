@@ -3,16 +3,16 @@
     "boxflinger": {
       "flake": false,
       "locked": {
-        "lastModified": 1782061069,
-        "narHash": "sha256-B+AnshynXPl6RA0nVY+R0vTAsgBIEukV9HM8ieCwJeQ=",
-        "ref": "refs/tags/V-1.0.11",
-        "rev": "228f966062879879dede8531511e2f5178e5988f",
-        "revCount": 53,
+        "lastModified": 1788093092,
+        "narHash": "sha256-2uPhN882iTKT0K3A/vyXdO8MZ7sf3jn9bosbnmA6NVw=",
+        "ref": "refs/tags/V-1.0.12",
+        "rev": "f942ee8e1338b4a8d2e2004a2018a62c4c0fa95c",
+        "revCount": 76,
         "type": "git",
         "url": "https://codeberg.org/ideumi/boxflinger"
       },
       "original": {
-        "ref": "refs/tags/V-1.0.11",
+        "ref": "refs/tags/V-1.0.12",
         "type": "git",
         "url": "https://codeberg.org/ideumi/boxflinger"
       }
